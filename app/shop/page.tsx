@@ -1,43 +1,61 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, Suspense, lazy } from 'react';
+import { useToast } from '../components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { supabase } from '../../lib/supabaseClient';
+import Image from 'next/image';
+import { fetchAllProducts } from '../lib/productService';
 import { useCart } from '../contexts/CartContext';
-import { ShoppingCart, Star, Heart, ChefHat, Flame, Zap, Eye, Plus } from 'lucide-react';
+import { Star, Heart, ChefHat, Flame, Zap, Eye, Plus } from 'lucide-react';
 
-// Interface matching the actual database schema
-interface TestProduct {
+// Lazy load heavy components
+// const ProductGrid = lazy(() => import('../components/ProductGrid')); // Will be used later
+
+// Interface matching the mock data structure
+interface MockProduct {
   id: number;
   name: string;
   description: string;
-  story: string;
   price: number;
-  original_price?: number;
   category: string;
-  spice_level: string; // 'Medium' or 'Spicy'
-  ingredients: string[];
-  cooking_tips: string[];
-  nutrition_facts: {
-    calories: string;
-    protein: string;
-    carbs: string;
-    fat: string;
-  };
-  rating: number;
-  reviews_count: number;
-  tags: string[];
-  in_stock: boolean;
-  featured: boolean;
+  spice_level: 'mild' | 'medium' | 'hot' | 'extra_hot';
   is_vegetarian: boolean;
+  stock: number;
+  image_url: string | null;
   created_at?: string;
-  image_url?: string;
+  long_description?: string;
+  ingredients?: string;
+  nutritional_info?: string;
+  tags?: string[];
 }
 
-export default function ShopPage() {
-  const [products, setProducts] = useState<TestProduct[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<TestProduct[]>([]);
+// Loading component for Suspense
+const ShopLoader = () => (
+  <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="text-center"
+    >
+      <div className="relative w-24 h-24 mx-auto mb-6">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          className="w-24 h-24 border-4 border-orange-200 border-t-orange-500 rounded-full"
+        />
+        <ChefHat className="absolute inset-0 m-auto w-8 h-8 text-orange-500" />
+      </div>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-2">Loading Our Collections</h2>
+      <p className="text-gray-600">Discovering the perfect flavors for you...</p>
+    </motion.div>
+  </div>
+);
+
+function ShopPage() {
+  const [products, setProducts] = useState<MockProduct[]>([]);
+  const { showToast } = useToast();
+  const [filteredProducts, setFilteredProducts] = useState<MockProduct[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [loading, setLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
@@ -45,7 +63,7 @@ export default function ShopPage() {
   const { addToCart } = useCart();
   const router = useRouter();
 
-  // Categories with circular layout
+  // Categories with circular layout - adapted for mock data categories
   const categories = [
     { 
       id: 'All', 
@@ -55,18 +73,32 @@ export default function ShopPage() {
       description: 'Explore our complete collection'
     },
     { 
-      id: 'Medium', 
-      name: 'Medium', 
+      id: 'Traditional Chutneys', 
+      name: 'Traditional', 
       icon: Zap, 
       color: 'from-yellow-400 to-orange-500',
-      description: 'Perfectly balanced flavors'
+      description: 'Classic family recipes'
     },
     { 
-      id: 'Spicy', 
+      id: 'Spicy Blends', 
       name: 'Spicy', 
       icon: Flame, 
       color: 'from-red-500 to-orange-600',
       description: 'For the adventurous taste'
+    },
+    { 
+      id: 'Heritage Collections', 
+      name: 'Heritage', 
+      icon: Heart, 
+      color: 'from-purple-400 to-pink-500',
+      description: 'Premium traditional blends'
+    },
+    { 
+      id: 'Premium Collection', 
+      name: 'Premium', 
+      icon: Star, 
+      color: 'from-indigo-400 to-purple-500',
+      description: 'Exquisite gourmet creations'
     }
   ];
 
@@ -74,52 +106,77 @@ export default function ShopPage() {
     fetchProducts();
   }, []);
 
+  const filterProducts = useCallback(() => {
+    console.log('🔍 Filtering products...');
+    console.log('📍 Total products before filter:', products.length);
+    console.log('🏷️ Selected category:', selectedCategory);
+    
+    let filtered = products;
+    
+    if (selectedCategory !== 'All') {
+      console.log('🔍 Filtering for category:', selectedCategory);
+      filtered = filtered.filter(product => {
+        console.log('📦 Product category:', product.category, 'vs selected:', selectedCategory, 'Match:', product.category === selectedCategory);
+        return product.category === selectedCategory;
+      });
+    }
+    
+    console.log('✅ Filtered products:', filtered.length);
+    setFilteredProducts(filtered);
+  }, [products, selectedCategory]);
+
   useEffect(() => {
     filterProducts();
-  }, [products, selectedCategory]);
+  }, [filterProducts]);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
       setError(null);
-      const { data, error: fetchError } = await supabase
-        .from('test_products')
-        .select('*')
-        .eq('in_stock', true) // Use correct column name
-        .order('featured', { ascending: false });
-
-      if (fetchError) throw fetchError;
+      console.log('🔍 Starting product fetch...');
       
-      setProducts(data || []);
+      const mockProducts = await fetchAllProducts();
+      console.log('📦 Fetched mock products:', mockProducts);
+      console.log('📊 Number of products:', mockProducts.length);
+      
+      if (!mockProducts || mockProducts.length === 0) {
+        console.warn('⚠️ No products returned from fetchAllProducts');
+        setError('No products available in the system.');
+        return;
+      }
+      
+      // Transform products to match MockProduct interface
+      const transformedProducts: MockProduct[] = mockProducts.map(p => ({
+        ...p,
+        spice_level: p.spice_level || 'medium',
+        is_vegetarian: p.is_vegetarian ?? true,
+        stock: p.stock || 50,
+        tags: p.tags || []
+      }));
+      
+      console.log('✅ Transformed products:', transformedProducts);
+      console.log('📍 Setting products state with', transformedProducts.length, 'items');
+      
+      setProducts(transformedProducts);
+      console.log('🎉 Products state updated successfully');
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('❌ Error fetching products:', error);
+      showToast(`Error fetching products: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
       setError('Failed to load products. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
-  const filterProducts = () => {
-    let filtered = products;
-    
-    if (selectedCategory !== 'All') {
-      filtered = filtered.filter(product => 
-        product.spice_level.toLowerCase() === selectedCategory.toLowerCase()
-      );
-    }
-    
-    setFilteredProducts(filtered);
-  };
-
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
   };
 
-  const handleProductClick = (product: TestProduct) => {
+  const handleProductClick = (product: MockProduct) => {
     router.push(`/product/${product.id}`);
   };
 
-  const validateProductForCart = (product: TestProduct): void => {
+  const validateProductForCart = (product: MockProduct): void => {
     // Enhanced validation
     if (!product.id || !product.name) {
       throw new Error('Invalid product data');
@@ -129,15 +186,29 @@ export default function ShopPage() {
       throw new Error('Invalid product price');
     }
 
-    if (!product.in_stock) {
+    if (product.stock <= 0) {
       throw new Error('Product is out of stock');
     }
   };
 
-  const handleAddToCart = async (product: TestProduct, e: React.MouseEvent, quantity: number = 1) => {
+  // Define interface for cart product (matching the cart context)
+  interface CartProduct {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    image_url: string | null;
+    category: string;
+    spice_level: 'mild' | 'medium' | 'hot' | 'extra_hot';
+    is_vegetarian: boolean;
+    stock: number;
+    created_at?: string;
+  }
+
+  const handleAddToCart = async (product: MockProduct, e: React.MouseEvent, quantity: number = 1) => {
     e.stopPropagation();
     
-    if (!product.in_stock) {
+    if (product.stock <= 0) {
       setError('Product is currently out of stock');
       return;
     }
@@ -148,28 +219,23 @@ export default function ShopPage() {
       // Validate product data before adding to cart
       validateProductForCart(product);
       
-      // Transform to match Supabase Product interface for cart compatibility
-      const cartProduct = {
+      // Transform to match cart interface
+      const cartItem: CartProduct = {
         id: product.id,
         name: product.name,
         description: product.description,
         price: product.price,
         image_url: product.image_url,
         category: product.category,
-        spice_level: product.spice_level as 'mild' | 'medium' | 'hot' | 'extra_hot',
-        is_vegetarian: product.is_vegetarian,
-        stock: 1, // Default stock value for cart compatibility
+        spice_level: product.spice_level || 'medium',
+        is_vegetarian: product.is_vegetarian || true,
+        stock: product.stock,
         created_at: product.created_at
       };
       
       // Add to cart with proper error handling
-      await addToCart(cartProduct, quantity);
-      
-      // Optional: Show success feedback (you could integrate with a toast library)
-      console.log(`Added ${product.name} to cart`);
-      
-      // Remove artificial delay as it's not necessary and can frustrate users
-      // await new Promise(resolve => setTimeout(resolve, 500));
+      await addToCart(cartItem, quantity);
+      showToast(`${product.name} added to cart successfully!`, 'success');
       
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -183,27 +249,19 @@ export default function ShopPage() {
     setError(null);
   };
 
+  // Helper function to get spice level icon/display
+  const getSpiceLevelDisplay = (spiceLevel: string) => {
+    switch (spiceLevel) {
+      case 'mild': return { emoji: '🌱', label: 'Mild', color: 'from-green-400 to-emerald-500' };
+      case 'medium': return { emoji: '⚡', label: 'Medium', color: 'from-yellow-400 to-orange-500' };
+      case 'hot': return { emoji: '🌶️🌶️', label: 'Hot', color: 'from-red-500 to-orange-600' };
+      case 'extra_hot': return { emoji: '🌶️🌶️🌶️', label: 'Extra Hot', color: 'from-red-600 to-red-700' };
+      default: return { emoji: '⚡', label: 'Medium', color: 'from-yellow-400 to-orange-500' };
+    }
+  };
+
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <div className="relative w-24 h-24 mx-auto mb-6">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="w-24 h-24 border-4 border-orange-200 border-t-orange-500 rounded-full"
-            />
-            <ChefHat className="absolute inset-0 m-auto w-8 h-8 text-orange-500" />
-          </div>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-2">Loading Our Collections</h2>
-          <p className="text-gray-600">Discovering the perfect flavors for you...</p>
-        </motion.div>
-      </div>
-    );
+    return <ShopLoader />;
   }
 
   return (
@@ -353,24 +411,27 @@ export default function ShopPage() {
             </p>
           </motion.div>
 
-          {/* Products Grid */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            {filteredProducts.map((product, index) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                index={index}
-                onProductClick={handleProductClick}
-                onAddToCart={handleAddToCart}
-                addingToCart={addingToCart}
-              />
-            ))}
-          </motion.div>
+          {/* Products Grid - Lazy loaded */}
+          <Suspense fallback={<ShopLoader />}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 1 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              {filteredProducts.map((product, index) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  index={index}
+                  onProductClick={handleProductClick}
+                  onAddToCart={handleAddToCart}
+                  addingToCart={addingToCart}
+                  getSpiceLevelDisplay={getSpiceLevelDisplay}
+                />
+              ))}
+            </motion.div>
+          </Suspense>
 
           {filteredProducts.length === 0 && (
             <motion.div
@@ -389,18 +450,21 @@ export default function ShopPage() {
   );
 }
 
+export default ShopPage;
+
 // Product Card Component
 interface ProductCardProps {
-  product: TestProduct;
+  product: MockProduct;
   index: number;
-  onProductClick: (product: TestProduct) => void;
-  onAddToCart: (product: TestProduct, e: React.MouseEvent, quantity?: number) => void;
+  onProductClick: (product: MockProduct) => void;
+  onAddToCart: (product: MockProduct, e: React.MouseEvent, quantity?: number) => void;
   addingToCart: string | null;
+  getSpiceLevelDisplay: (spiceLevel: string) => { emoji: string; label: string; color: string };
 }
 
-function ProductCard({ product, index, onProductClick, onAddToCart, addingToCart }: ProductCardProps) {
-  const isSpicy = product.spice_level === 'Spicy';
-  const isOutOfStock = !product.in_stock;
+function ProductCard({ product, index, onProductClick, onAddToCart, addingToCart, getSpiceLevelDisplay }: ProductCardProps) {
+  const spiceDisplay = getSpiceLevelDisplay(product.spice_level || 'medium');
+  const isOutOfStock = product.stock <= 0;
   
   return (
     <motion.div
@@ -416,27 +480,43 @@ function ProductCard({ product, index, onProductClick, onAddToCart, addingToCart
       }`}>
         {/* Product Image */}
         <div className="relative h-64 overflow-hidden">
-          <motion.img
-            src={product.image_url || '/placeholder-food.svg'}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-            whileHover={{ scale: 1.05 }}
-            loading="lazy"
-          />
+          <motion.div className="w-full h-full relative">
+            {product.image_url ? (
+              <Image
+                src={product.image_url}
+                alt={product.name}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover group-hover:scale-110 transition-transform duration-500"
+                onError={(e) => {
+                  // If image fails to load, show placeholder
+                  const target = e.target as HTMLImageElement;
+                  target.src = '/placeholder-food.svg';
+                }}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                <span className="text-gray-400">No image available</span>
+              </div>
+            )}
+          </motion.div>
           
           {/* Spice Level Badge */}
-          <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold text-white ${
-            isSpicy 
-              ? 'bg-gradient-to-r from-red-500 to-orange-500' 
-              : 'bg-gradient-to-r from-yellow-400 to-orange-400'
-          }`}>
-            {isSpicy ? '🔥 Spicy' : '⚡ Medium'}
+          <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold text-white bg-gradient-to-r ${spiceDisplay.color}`}>
+            {spiceDisplay.emoji} {spiceDisplay.label}
           </div>
 
           {/* Stock Status */}
           {isOutOfStock && (
             <div className="absolute top-4 left-4 px-3 py-1 bg-gray-500 text-white rounded-full text-xs font-semibold">
               Out of Stock
+            </div>
+          )}
+
+          {/* Stock Count */}
+          {!isOutOfStock && product.stock < 10 && (
+            <div className="absolute top-4 left-4 px-3 py-1 bg-amber-500 text-white rounded-full text-xs font-semibold">
+              {product.stock} left
             </div>
           )}
 
@@ -474,28 +554,24 @@ function ProductCard({ product, index, onProductClick, onAddToCart, addingToCart
             {product.description}
           </p>
 
-          {/* Rating */}
-          <div className="flex items-center mb-4">
-            <div className="flex text-yellow-400">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-4 h-4 ${i < Math.floor(product.rating) ? 'fill-current' : ''}`}
-                />
+          {/* Tags */}
+          {product.tags && product.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-4">
+              {product.tags.slice(0, 3).map((tag, idx) => (
+                <span
+                  key={idx}
+                  className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full"
+                >
+                  {tag}
+                </span>
               ))}
             </div>
-            <span className="text-sm text-gray-500 ml-2">
-              ({product.reviews_count})
-            </span>
-          </div>
+          )}
 
           {/* Price and Add to Cart */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <span className="text-2xl font-bold text-gray-800">₹{product.price}</span>
-              {product.original_price && (
-                <span className="text-sm text-gray-500 line-through">₹{product.original_price}</span>
-              )}
             </div>
             
             <motion.button

@@ -4,37 +4,40 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { CarouselProduct } from '../../lib/productService';
+import { CarouselProduct, fetchRelatedProducts, fetchProductById } from '../../lib/productService';
 import Image from 'next/image';
 import { useCart } from '../../contexts/CartContext';
 import Carousel3D from '../../components/Carousel3D';
-import { Star, Heart, Clock, Users, Award, MapPin, ChefHat, Leaf, Sparkles } from 'lucide-react';
+import { Star, Heart, Clock, Users, Award, MapPin, ChefHat, Leaf, Sparkles, Utensils, Package } from 'lucide-react';
 
-interface TestProduct {
+interface MockProduct {
   id: number;
   name: string;
   description: string;
-  story: string;
   price: number;
-  original_price?: number;
   category: string;
-  spice_level: string;
-  ingredients: string[];
-  cooking_tips: string[];
-  nutrition_facts: {
+  spice_level: 'mild' | 'medium' | 'hot' | 'extra_hot';
+  is_vegetarian: boolean;
+  stock: number;
+  image_url: string | null;
+  created_at?: string;
+  long_description?: string;
+  ingredients?: string;
+  nutritional_info?: string;
+  tags?: string[];
+  // Additional properties for product details
+  rating?: number;
+  reviews_count?: number;
+  story?: string;
+  original_price?: number;
+  in_stock?: boolean;
+  cooking_tips?: string[];
+  nutrition_facts?: {
     calories: string;
     protein: string;
     carbs: string;
     fat: string;
   };
-  rating: number;
-  reviews_count: number;
-  tags: string[];
-  in_stock: boolean;
-  featured: boolean;
-  is_vegetarian: boolean;
-  created_at?: string;
-  image_url?: string;
 }
 
 export default function ProductDetailPage() {
@@ -42,8 +45,8 @@ export default function ProductDetailPage() {
   const router = useRouter();
   const id = params.id as string;
   
-  const [product, setProduct] = useState<TestProduct | null>(null);
-  const [relatedProducts] = useState<CarouselProduct[]>([]);
+  const [product, setProduct] = useState<MockProduct | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<CarouselProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -61,39 +64,66 @@ export default function ProductDetailPage() {
       try {
         setLoading(true);
         setError(null);
+        console.log('🔍 Loading product with ID:', id);
         
-        // Mock data for demonstration - replace with actual API call
-        const mockProduct: TestProduct = {
-          id: parseInt(id),
-          name: "Traditional Coconut Chutney",
-          description: "Fresh coconut chutney with green chilies and curry leaves - perfect companion for idli and dosa",
-          story: "Our grandmother's secret recipe passed down through four generations. In the coastal villages of Kerala, coconut trees sway as they have for centuries, and this chutney captures the essence of those peaceful mornings. Made with freshly grated coconut, this recipe has been refined by my great-grandmother who believed that the best flavors come from patience and love. Every bite takes you back to those traditional breakfast tables where families gather to share stories and start their day together.",
-          price: 120.00,
-          original_price: 150.00,
-          category: "Traditional",
-          spice_level: "Medium",
-          ingredients: ["Fresh coconut", "Green chilies", "Curry leaves", "Ginger", "Salt", "Yogurt"],
-          cooking_tips: ["Grind coconut while fresh for best flavor", "Serve with hot idlis or dosas", "Add tempering with mustard seeds for extra flavor"],
+        // Fetch product data from mock service
+        const productData = await fetchProductById(parseInt(id));
+        console.log('📦 Fetched product data:', productData);
+
+        if (!productData) {
+          console.warn('⚠️ Product not found');
+          setError('Product not found');
+          setLoading(false);
+          return;
+        }
+
+        // Transform to match our interface with defaults
+        const transformedProduct: MockProduct = {
+          id: productData.id,
+          name: productData.name,
+          description: productData.description,
+          price: productData.price,
+          category: productData.category,
+          spice_level: productData.spice_level || 'medium',
+          is_vegetarian: productData.is_vegetarian || true,
+          stock: productData.stock || 50,
+          image_url: productData.image_url,
+          created_at: productData.created_at,
+          long_description: productData.long_description,
+          ingredients: productData.ingredients,
+          nutritional_info: productData.nutritional_info,
+          tags: productData.tags || [],
+          // Add defaults for missing properties
+          rating: 4.5,
+          reviews_count: 127,
+          story: productData.long_description || productData.description,
+          original_price: undefined,
+          in_stock: productData.stock > 0,
+          cooking_tips: [
+            "Best enjoyed fresh with hot rice or dosas",
+            "Store in refrigerator after opening",
+            "Let it come to room temperature before serving"
+          ],
           nutrition_facts: {
-            calories: "89",
-            protein: "2.1g",
-            carbs: "4.2g",
-            fat: "7.8g"
-          },
-          rating: 4.8,
-          reviews_count: 156,
-          tags: ["traditional", "breakfast", "kerala", "vegetarian"],
-          in_stock: true,
-          featured: true,
-          is_vegetarian: true,
-          image_url: "/coconut-chutney.png" // FIXED: Changed from /assets/coconut-chutney.png to /coconut-chutney.png
+            calories: "85 kcal",
+            protein: "3.2g",
+            carbs: "12.1g", 
+            fat: "2.8g"
+          }
         };
         
-        setProduct(mockProduct);
+        console.log('✅ Transformed product:', transformedProduct);
+        setProduct(transformedProduct);
+
+        // Fetch related products
+        const relatedData = await fetchRelatedProducts(parseInt(id), productData.category);
+        console.log('🔗 Related products:', relatedData);
+        setRelatedProducts(relatedData);
+
         setLoading(false);
       } catch (err) {
-        setError('Failed to fetch product details');
-        console.error('Error fetching product:', err);
+        console.error('❌ Error loading product:', err);
+        setError('Failed to load product details');
         setLoading(false);
       }
     }
@@ -107,17 +137,17 @@ export default function ProductDetailPage() {
     setAddingToCart(true);
     
     try {
-      // Transform to match Supabase Product interface for cart compatibility
+      // Transform to match cart interface
       const cartProduct = {
         id: product.id,
         name: product.name,
         description: product.description,
         price: product.price,
-        image_url: product.image_url || null,
+        image_url: product.image_url,
         category: product.category,
-        spice_level: product.spice_level as 'mild' | 'medium' | 'hot' | 'extra_hot',
-        is_vegetarian: product.is_vegetarian,
-        stock: 1,
+        spice_level: product.spice_level || 'medium',
+        is_vegetarian: product.is_vegetarian || true,
+        stock: product.stock,
         created_at: product.created_at
       };
       
@@ -149,11 +179,27 @@ export default function ProductDetailPage() {
   };
 
   const storySections = [
-    { icon: ChefHat, title: "The Heritage", subtitle: "4 Generations of Love" },
-    { icon: MapPin, title: "The Origin", subtitle: "Kerala's Coastal Villages" },
-    { icon: Users, title: "The Family", subtitle: "Grandmother's Secret Recipe" },
-    { icon: Heart, title: "The Tradition", subtitle: "Morning Breakfast Stories" }
+    { icon: ChefHat, title: "The Heritage", subtitle: "Family Recipe" },
+    { icon: MapPin, title: "The Origin", subtitle: "Traditional Roots" },
+    { icon: Users, title: "The Family", subtitle: "Generational Knowledge" },
+    { icon: Heart, title: "The Tradition", subtitle: "Culinary Legacy" }
   ];
+
+  // Dynamic spice level styling
+  const getSpiceLevelInfo = (spiceLevel: string) => {
+    switch (spiceLevel) {
+      case 'mild':
+        return { icon: '🌱', bgClass: 'bg-gradient-to-r from-green-400 to-emerald-500', text: 'Mild' };
+      case 'medium':
+        return { icon: '⚡', bgClass: 'bg-gradient-to-r from-yellow-400 to-orange-400', text: 'Medium' };
+      case 'hot':
+        return { icon: '🌶️🌶️', bgClass: 'bg-gradient-to-r from-red-500 to-orange-500', text: 'Hot' };
+      case 'extra_hot':
+        return { icon: '🌶️🌶️🌶️', bgClass: 'bg-gradient-to-r from-red-600 to-red-700', text: 'Extra Hot' };
+      default:
+        return { icon: '⚡', bgClass: 'bg-gradient-to-r from-yellow-400 to-orange-400', text: 'Medium' };
+    }
+  };
 
   if (loading) {
     return (
@@ -216,6 +262,8 @@ export default function ProductDetailPage() {
       </div>
     );
   }
+
+  const spiceInfo = getSpiceLevelInfo(product.spice_level);
 
   return (
     <AnimatePresence mode="wait">
@@ -308,7 +356,10 @@ export default function ProductDetailPage() {
                   className="space-y-6"
                 >
                   <p className="text-xl text-gray-700 leading-relaxed font-medium">
-                    {product.story.substring(0, 200)}...
+                    {product.story && product.story.length > 200 
+                      ? `${product.story.substring(0, 200)}...` 
+                      : product.story || product.description
+                    }
                   </p>
                   
                   {/* Story Progress Indicators */}
@@ -326,7 +377,7 @@ export default function ProductDetailPage() {
                         >
                           <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
                             activeStorySection === index 
-                              ? 'bg-orange-100 border-2 border-orange-500' 
+                              ? 'bg-black-100 border-2 border-orange-500' 
                               : 'bg-gray-100'
                           }`}>
                             <Icon className="w-6 h-6" />
@@ -353,15 +404,15 @@ export default function ProductDetailPage() {
                       <Star
                         key={i}
                         className={`w-5 h-5 ${
-                          i < Math.floor(product.rating) 
+                          i < Math.floor(product.rating || 4.5) 
                             ? 'text-yellow-400 fill-current' 
                             : 'text-gray-300'
                         }`}
                       />
                     ))}
                   </div>
-                  <span className="text-lg font-semibold text-gray-800">{product.rating}</span>
-                  <span className="text-gray-600">({product.reviews_count} stories shared)</span>
+                  <span className="text-lg font-semibold text-gray-800">{product.rating || 4.5}</span>
+                  <span className="text-gray-600">({product.reviews_count || 127} stories shared)</span>
                 </motion.div>
               </motion.div>
 
@@ -426,12 +477,9 @@ export default function ProductDetailPage() {
                       transition={{ delay: 1 }}
                       className="absolute top-6 left-6"
                     >
-                      <div className={`px-4 py-2 rounded-full text-white font-semibold text-sm ${
-                        product.spice_level === 'Spicy' 
-                          ? 'bg-gradient-to-r from-red-500 to-orange-500' 
-                          : 'bg-gradient-to-r from-yellow-400 to-orange-400'
-                      }`}>
-                        {product.spice_level === 'Spicy' ? '🔥 Spicy' : '⚡ Medium'}
+                      <div className={`${spiceInfo.bgClass} px-4 py-2 rounded-full text-white font-semibold text-sm flex items-center space-x-1`}>
+                        <span>{spiceInfo.icon}</span>
+                        <span>{spiceInfo.text}</span>
                       </div>
                     </motion.div>
 
@@ -444,7 +492,7 @@ export default function ProductDetailPage() {
                     >
                       <div className="bg-black bg-opacity-70 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium flex items-center space-x-2">
                         <Clock className="w-4 h-4" />
-                        <span>4 Generations</span>
+                        <span>Traditional Recipe</span>
                       </div>
                     </motion.div>
                   </motion.div>
@@ -509,7 +557,7 @@ export default function ProductDetailPage() {
                 The Story Behind Every Bite
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                {product.story}
+                {product.story || product.long_description || `${product.description} This authentic recipe represents the rich culinary heritage passed down through generations, bringing the true flavors of tradition to your table.`}
               </p>
             </motion.div>
 
@@ -536,10 +584,10 @@ export default function ProductDetailPage() {
                       }`}>
                         <h3 className="text-2xl font-bold text-gray-800 mb-4">{section.title}</h3>
                         <p className="text-gray-600 leading-relaxed">
-                          {index === 0 && "Crafted with love and refined over four generations, each recipe carries the essence of our family's culinary heritage."}
-                          {index === 1 && "Born in the lush coastal villages of Kerala, where coconut trees dance in the tropical breeze and spices tell stories of the land."}
-                          {index === 2 && "Our grandmother's secret recipe, passed down through generations, represents the heart of our family's cooking tradition."}
-                          {index === 3 && "Every morning, families gather around tables filled with these chutneys, creating moments of connection and joy."}
+                          {index === 0 && "Crafted with love and attention to detail, this recipe represents the essence of traditional cooking methods passed down through generations."}
+                          {index === 1 && "Born from the rich culinary traditions of South India, where spices and flavors come together to create something truly special."}
+                          {index === 2 && "Our family recipe, perfected over time, captures the authentic taste that can only come from years of tradition and expertise."}
+                          {index === 3 && "Every jar brings the same love and care that has been poured into this recipe for decades, ensuring each bite is a journey through time."}
                         </p>
                       </div>
                     </div>
@@ -590,23 +638,27 @@ export default function ProductDetailPage() {
                 </div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">Premium Ingredients</h3>
                 <div className="space-y-3">
-                  {product.ingredients.map((ingredient, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      viewport={{ once: true }}
-                      className="flex items-center space-x-3"
-                    >
-                      <div className="w-2 h-2 bg-orange-500 rounded-full" />
-                      <span className="text-gray-700">{ingredient}</span>
-                    </motion.div>
-                  ))}
+                  {product.ingredients ? (
+                    product.ingredients.split(',').map((ingredient, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        viewport={{ once: true }}
+                        className="flex items-center space-x-3"
+                      >
+                        <div className="w-2 h-2 bg-orange-500 rounded-full" />
+                        <span className="text-gray-700">{ingredient.trim()}</span>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 italic">Fresh, quality ingredients carefully selected for authentic taste.</p>
+                  )}
                 </div>
               </motion.div>
 
-              {/* Chef Tips */}
+              {/* Chef's Secrets */}
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -617,18 +669,41 @@ export default function ProductDetailPage() {
                 <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mb-6 mx-auto">
                   <ChefHat className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">Chef's Secrets</h3>
-                <div className="space-y-4">
-                  {product.cooking_tips.map((tip, index) => (
+                <h3 className="text-2xl font-bold text-gray-800 mb-8 text-center">Chef&apos;s Secrets</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    {
+                      title: "Serving Suggestion",
+                      tip: product.cooking_tips?.[0] || "Best enjoyed fresh with hot rice or dosas",
+                      icon: <Utensils className="w-6 h-6 text-orange-500" />,
+                      bg: "from-orange-50 to-orange-100"
+                    },
+                    {
+                      title: "Storage Tips",
+                      tip: product.cooking_tips?.[1] || "Store in refrigerator after opening and consume within 5 days",
+                      icon: <Package className="w-6 h-6 text-amber-500" />,
+                      bg: "from-amber-50 to-amber-100"
+                    },
+                    {
+                      title: "Pro Tip",
+                      tip: product.cooking_tips?.[2] || "For best flavor, let it come to room temperature before serving",
+                      icon: <Sparkles className="w-6 h-6 text-yellow-500" />,
+                      bg: "from-yellow-50 to-yellow-100"
+                    }
+                  ].map((item, index) => (
                     <motion.div
                       key={index}
-                      initial={{ opacity: 0, x: 20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
                       viewport={{ once: true }}
-                      className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500"
+                      className={`bg-gradient-to-br ${item.bg} p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col`}
                     >
-                      <p className="text-gray-700 italic">&ldquo;{tip}&rdquo;</p>
+                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm">
+                        {item.icon}
+                      </div>
+                      <h4 className="text-lg font-semibold text-gray-800 mb-2">{item.title}</h4>
+                      <p className="text-gray-600 flex-1">&ldquo;{item.tip}&rdquo;</p>
                     </motion.div>
                   ))}
                 </div>
@@ -647,7 +722,12 @@ export default function ProductDetailPage() {
                 </div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">Nutrition Facts</h3>
                 <div className="space-y-4">
-                  {Object.entries(product.nutrition_facts).map(([key, value], index) => (
+                  {Object.entries(product.nutrition_facts || {
+                    calories: "85 kcal",
+                    protein: "3.2g",
+                    carbs: "12.1g", 
+                    fat: "2.8g"
+                  }).map(([key, value], index) => (
                     <motion.div
                       key={key}
                       initial={{ opacity: 0, scale: 0.8 }}
@@ -666,169 +746,238 @@ export default function ProductDetailPage() {
           </div>
         </section>
 
-        {/* Purchase Section */}
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-6">
-            <div className="max-w-4xl mx-auto">
+        {/* Enhanced Purchase Section */}
+        <section className="py-12 md:py-20 bg-gray-50">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-5xl mx-auto">
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
-                className="bg-gradient-to-br from-orange-500 to-red-500 rounded-3xl p-8 lg:p-12 text-white relative overflow-hidden"
+                className="bg-white rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden border border-gray-100"
               >
-                {/* Background Pattern */}
-                <div className="absolute inset-0 opacity-10">
-                  <div className="w-full h-full" style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M20 20c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20zM0 20c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20S0 31.046 0 20z'/%3E%3C/g%3E%3C/svg%3E")`,
-                    backgroundSize: '60px 60px'
-                  }} />
-                </div>
-
-                <div className="relative z-10">
-                  <div className="text-center mb-12">
-                    <h2 className="text-4xl lg:text-5xl font-bold mb-4">
-                      Bring This Story Home
-                    </h2>
-                    <p className="text-xl opacity-90">
-                      Experience the tradition that has brought families together for generations
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    {/* Product Summary */}
-                    <div className="space-y-6">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-20 h-20 bg-white rounded-xl overflow-hidden">
+                <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[500px] lg:min-h-[600px]">
+                  {/* Product Information Side */}
+                  <div className="relative bg-gradient-to-br from-orange-50 to-red-50 p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-center">
+                    {/* Decorative Elements */}
+                    <div className="hidden sm:block absolute top-6 right-6 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-br from-orange-200 to-red-200 rounded-full opacity-20 blur-xl" />
+                    <div className="hidden sm:block absolute bottom-6 left-6 w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-gradient-to-br from-red-200 to-orange-200 rounded-full opacity-20 blur-xl" />
+                    
+                    <div className="relative z-10">
+                      {/* Product Badge */}
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.2 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="flex items-center space-x-3 mb-6"
+                      >
+                        <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-5 py-2 rounded-full text-sm font-semibold flex items-center space-x-2 shadow-lg">
+                          <Award className="w-4 h-4" />
+                          <span>Heritage Recipe</span>
+                        </div>
+                        {product.is_vegetarian && (
+                          <div className="bg-green-100 text-green-800 px-3 py-2 rounded-full text-sm font-medium flex items-center space-x-1">
+                            <Leaf className="w-4 h-4" />
+                            <span>100% Vegetarian</span>
+                          </div>
+                        )}
+                      </motion.div>
+                       {/* Product Image */}
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.5 }}
+                        className="w-full flex justify-center bg-white rounded-2xl shadow-lg overflow-hidden mb-6 p-4 lg:p-6"
+                      >
+                        <div className="relative w-full max-w-[280px] sm:max-w-[350px] md:max-w-md aspect-square mx-auto">
                           <Image 
                             src={product.image_url || '/placeholder-food.svg'}
                             alt={product.name}
-                            width={80}
-                            height={80}
-                            className="w-full h-full object-cover"
+                            fill
+                            sizes="(max-width: 768px) 90vw, (max-width: 1200px) 50vw, 40vw"
+                            className="object-contain drop-shadow-lg"
                             priority
+                            quality={100}
                           />
                         </div>
-                        <div>
-                          <h3 className="text-2xl font-bold">{product.name}</h3>
-                          <p className="opacity-80">Heritage Recipe • 4 Generations</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center space-x-6">
-                        <div className="text-center">
-                          <div className="text-3xl font-bold">₹{product.price}</div>
-                          <div className="text-sm opacity-75">per jar</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="flex items-center space-x-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className="w-4 h-4 fill-current" />
-                            ))}
-                          </div>
-                          <div className="text-sm opacity-75">{product.rating} rating</div>
-                        </div>
-                      </div>
-                    </div>
+                      </motion.div>
 
-                    {/* Purchase Controls */}
-                    <div className="space-y-8">
-                      {/* Quantity Selector */}
-                      <div>
-                        <label className="block text-lg font-semibold mb-4">Quantity</label>
-                        <div className="flex items-center space-x-4">
+                      {/* Product Title */}
+                      <motion.h2
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight"
+                      >
+                        {product.name}
+                      </motion.h2>
+
+                      {/* Product Description */}
+                      <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="text-gray-600 text-base md:text-lg mb-6 leading-relaxed"
+                      >
+                        {product.description}
+                      </motion.p>
+                     {/* Rating */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="flex items-center space-x-3 mb-6"
+                    >
+                      <div className="flex items-center space-x-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-5 h-5 ${
+                              i < Math.floor(product.rating || 4.5) 
+                                ? 'text-yellow-400 fill-current' 
+                                : 'text-gray-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-lg font-semibold text-gray-800">{product.rating || 4.5}</span>
+                      <span className="text-gray-600">({product.reviews_count || 127} reviews)</span>
+                    </motion.div>
+                     
+
+                      
+                    </div>
+                  </div>
+
+                  {/* Purchase Controls Side */}
+                  <div className="p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-center">
+
+                    {/* Quantity Selector */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="mb-8 w-full"
+                    >
+                      <div className="flex flex-col items-center justify-center space-y-4">
+                        <label className="block text-lg font-semibold text-gray-800">Quantity</label>
+                        <div className="flex items-center justify-center space-x-4">
                           <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => handleQuantityChange(quantity - 1)}
                             disabled={quantity <= 1}
-                            className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-xl ${
+                            className={`w-14 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center font-bold text-xl transition-all duration-200 ${
                               quantity <= 1
-                                ? 'bg-gray-400 cursor-not-allowed'
-                                : 'bg-white text-orange-500 hover:bg-orange-50'
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 shadow-sm'
                             }`}
                           >
                             -
                           </motion.button>
                           
-                          <motion.div
-                            className="w-20 h-14 bg-white rounded-xl flex items-center justify-center"
-                            whileFocus={{ scale: 1.05 }}
-                          >
+                          <div className="w-20 h-12 md:w-24 md:h-14 bg-gray-50 border-2 border-gray-200 rounded-xl flex items-center justify-center">
                             <span className="text-2xl font-bold text-gray-800">{quantity}</span>
-                          </motion.div>
+                          </div>
                           
                           <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => handleQuantityChange(quantity + 1)}
                             disabled={quantity >= 10}
-                            className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-xl ${
+                            className={`w-14 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center font-bold text-xl transition-all duration-200 ${
                               quantity >= 10
-                                ? 'bg-gray-400 cursor-not-allowed'
-                                : 'bg-white text-orange-500 hover:bg-orange-50'
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 shadow-sm'
                             }`}
                           >
                             +
                           </motion.button>
                         </div>
                       </div>
+                    </motion.div>
 
-                      {/* Total Price */}
-                      <div className="text-center">
-                        <p className="text-lg opacity-90 mb-2">Total</p>
-                        <div className="text-4xl font-bold">₹{(product.price * quantity).toFixed(2)}</div>
-                        {product.original_price && (
-                          <div className="text-lg opacity-75 line-through">₹{(product.original_price * quantity).toFixed(2)}</div>
-                        )}
+                    {/* Total Price */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      className="text-center mb-8 p-4 bg-gray-50 rounded-xl"
+                    >
+                      <p className="text-gray-600 mb-2">Total Price</p>
+                      <div className="text-3xl md:text-4xl font-bold text-gray-900">₹{(product.price * quantity).toFixed(2)}</div>
+                    </motion.div>
+
+                    {/* Add to Cart Button */}
+                    <motion.button
+                      onClick={handleAddToCart}
+                      disabled={addingToCart || !(product.in_stock ?? (product.stock > 0))}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`w-full py-4 md:py-6 px-6 md:px-8 rounded-xl font-bold text-lg md:text-xl transition-all duration-300 shadow-lg ${
+                        !(product.in_stock ?? (product.stock > 0))
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          : addingToCart
+                          ? 'bg-green-600 text-white cursor-wait'
+                          : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 shadow-xl hover:shadow-2xl'
+                      }`}
+                    >
+                      {addingToCart ? (
+                        <div className="flex items-center justify-center space-x-3">
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                          />
+                          <span>Adding to cart...</span>
+                        </div>
+                      ) : !(product.in_stock ?? (product.stock > 0)) ? (
+                        'Out of Stock'
+                      ) : (
+                        <div className="flex items-center justify-center space-x-2">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.68 4.24M7 13v8a2 2 0 002 2h8a2 2 0 002-2v-8M7 13v8" />
+                          </svg>
+                          <span>Add {quantity} to Cart</span>
+                        </div>
+                      )}
+                    </motion.button>
+
+                    {/* Trust Indicators */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                      className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center"
+                    >
+                      <div className="flex flex-col items-center space-y-2 p-3 bg-green-50 rounded-lg">
+                        <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                        <span className="text-sm font-medium text-green-800">Fresh Daily</span>
                       </div>
-
-                      {/* Add to Cart Button */}
-                      <motion.button
-                        onClick={handleAddToCart}
-                        disabled={addingToCart || !product.in_stock}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`w-full py-6 px-8 rounded-2xl font-bold text-xl transition-all duration-300 ${
-                          !product.in_stock
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : addingToCart
-                            ? 'bg-green-600 cursor-wait'
-                            : 'bg-white text-orange-600 hover:bg-orange-50 shadow-xl hover:shadow-2xl'
-                        }`}
-                      >
-                        {addingToCart ? (
-                          <div className="flex items-center justify-center space-x-3">
-                            <motion.div
-                              animate={{ rotate: 360 }}
-                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                              className="w-6 h-6 border-2 border-white border-t-transparent rounded-full"
-                            />
-                            <span>Adding to your story...</span>
-                          </div>
-                        ) : !product.in_stock ? (
-                          'Currently Unavailable'
-                        ) : (
-                          `Add ${quantity} to Cart`
-                        )}
-                      </motion.button>
-
-                      {/* Trust Indicators */}
-                      <div className="flex justify-center space-x-8 text-sm opacity-80">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-green-400 rounded-full" />
-                          <span>Fresh Daily</span>
+                      
+                      <div className="flex flex-col items-center space-y-2 p-3 bg-blue-50 rounded-lg">
+                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-green-400 rounded-full" />
-                          <span>No Preservatives</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-green-400 rounded-full" />
-                          <span>Family Recipe</span>
-                        </div>
+                        <span className="text-sm font-medium text-blue-800">No Preservatives</span>
                       </div>
-                    </div>
+                      
+                      <div className="flex flex-col items-center space-y-2 p-3 bg-orange-50 rounded-lg">
+                        <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                          </svg>
+                        </div>
+                        <span className="text-sm font-medium text-orange-800">Family Recipe</span>
+                      </div>
+                    </motion.div>
                   </div>
                 </div>
               </motion.div>

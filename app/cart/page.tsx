@@ -7,16 +7,16 @@ import { Input } from '../components/ui/input';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import ProductRecommendations, { RecommendationProduct as Product } from '../components/ProductRecommendations';
+import ProductRecommendations, { RecommendationProduct } from '../components/ProductRecommendations';
 import { useToast } from '../components/Toast';
 import { Product as SupabaseProduct } from '../../lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 
-// Define the union type for the onAddToCart parameter
-type AnyProduct = SupabaseProduct | Product;
+// Define the union type that ProductRecommendations expects
+type AnyProduct = SupabaseProduct | RecommendationProduct;
 
 export default function CartPage() {
-  const { items, loading, updateQuantity, removeFromCart, total, checkout, addToCart } = useCart();
+  const { items, loading, updateQuantity, removeFromCart, total, addToCart } = useCart();
   const { showToast } = useToast();
   const router = useRouter();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -24,8 +24,6 @@ export default function CartPage() {
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
   const [discount, setDiscount] = useState(0);
-  const [savedForLater, setSavedForLater] = useState<string[]>([]);
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [addingItem, setAddingItem] = useState<string | null>(null);
 
   const shippingThreshold = 500;
@@ -35,17 +33,17 @@ export default function CartPage() {
   const handleAddToCartFromRecommendations = async (product: AnyProduct) => {
     setAddingItem(product.id.toString());
     try {
-      // Convert to SupabaseProduct for addToCart
+      // Convert to SupabaseProduct for addToCart with safe property access
       const supabaseProduct: SupabaseProduct = {
         id: product.id as number,
         name: product.name,
         price: product.price,
         category: product.category,
         description: product.description,
-        image_url: product.image_url,
+        image_url: product.image_url || null,
         stock: product.stock,
-        is_vegetarian: product.is_vegetarian,
-        spice_level: product.spice_level
+        is_vegetarian: true,
+        spice_level: 'medium'
       };
       await addToCart(supabaseProduct, 1);
       showToast(`${product.name} added to cart successfully!`, 'success');
@@ -101,20 +99,7 @@ export default function CartPage() {
     showToast('Promo code removed', 'info');
   };
 
-  const toggleExpandedItem = (itemId: string) => {
-    setExpandedItems(prev => 
-      prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId)
-        : [...prev, itemId]
-    );
-  };
-
-  const saveForLater = (itemId: string) => {
-    if (!savedForLater.includes(itemId)) {
-      setSavedForLater(prev => [...prev, itemId]);
-      showToast('Item saved for later', 'info');
-    }
-  };
+  // Removed unused toggleExpandedItem and saveForLater functions
 
   if (loading) {
     return (
@@ -201,7 +186,7 @@ export default function CartPage() {
                   </p>
                 ) : (
                   <p className="text-sm text-green-600 mt-2 font-medium">
-                    🎉 Congratulations! You've qualified for free shipping!
+                    🎉 Congratulations! You&apos;ve qualified for free shipping!
                   </p>
                 )}
               </motion.div>
@@ -209,30 +194,23 @@ export default function CartPage() {
               {/* Dynamic Product Recommendations */}
               <ProductRecommendations 
                 cartItems={items.map(item => ({
-                  id: item.id || '',
+                  id: item.id,
                   product: {
-                    id: item.id || '',
-                    name: item.product?.name || 'Product',
-                    price: item.product?.price || 0,
-                    category: item.product?.category || 'general',
-                    description: item.product?.description || '',
-                    image_url: item.product?.image_url || '/placeholder-food.svg',
-                    stock: item.product?.stock || 0,
-                    is_vegetarian: item.product?.is_vegetarian || true,
-                    spice_level: item.product?.spice_level || 'mild',
-                    isPopular: false,
-                    isNew: false,
+                    ...item.product,
+                    image_url: item.product.image_url || '/placeholder-food.svg',
+                    // Add mock values for LocalProduct properties
+                    reviews: item.product.rating || 0,
                     inStock: true,
-                    rating: 4.5,
-                    reviews: 0
+                    spice_level: (item.product.spice_level as 'mild' | 'medium' | 'hot' | 'extra_hot') || 'medium',
+                    rating: item.product.rating || 0
                   },
-                  quantity: item.quantity || 1,
+                  quantity: item.quantity
                 }))}
                 onAddToCart={handleAddToCartFromRecommendations}
                 loadingItemId={addingItem}
               />
 
-              {/* Cart Items */}
+              {/* Cart Items - Horizontal Layout */}
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -240,11 +218,8 @@ export default function CartPage() {
                 className="bg-white rounded-2xl shadow-lg overflow-hidden"
               >
                 <div className="p-6 border-b border-gray-100">
-                  <h3 className="text-xl font-bold text-gray-800 flex items-center">
-                    <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm mr-3">
-                      {items.length} {items.length === 1 ? 'Item' : 'Items'}
-                    </span>
-                    Shopping Cart
+                  <h3 className="text-xl font-bold text-gray-800">
+                    Cart Items ({items.length})
                   </h3>
                 </div>
 
@@ -259,211 +234,105 @@ export default function CartPage() {
                         transition={{ delay: index * 0.1 }}
                         className="p-6 hover:bg-gray-50 transition-colors duration-300"
                       >
-                        <div className="flex gap-6">
-                          {/* Product Image - Wider */}
-                          <div className="flex-shrink-0 relative group">
+                        <div className="flex gap-6 items-center">
+                          {/* Product Image */}
+                          <div className="flex-shrink-0">
                             {item.product.image_url ? (
                               <Image 
                                 src={item.product.image_url}
                                 alt={item.product.name}
-                                width={120}
-                                height={120}
-                                className="w-32 h-32 object-cover rounded-xl shadow-md group-hover:shadow-lg transition-shadow duration-300"
+                                width={80}
+                                height={80}
+                                className="w-20 h-20 object-cover rounded-lg"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = '/placeholder-food.svg';
+                                }}
                               />
                             ) : (
-                              <div className="w-32 h-32 bg-gray-100 rounded-xl flex items-center justify-center shadow-md">
-                                <span className="text-gray-400 text-sm">No Image</span>
+                              <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
+                                <span className="text-gray-500 text-xs">No Image</span>
                               </div>
                             )}
-                            {/* Quick actions overlay */}
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 rounded-xl transition-all duration-300 flex items-center justify-center">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="opacity-0 group-hover:opacity-100 bg-white shadow-lg"
-                                onClick={() => toggleExpandedItem(item.id!)}
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                              </Button>
-                            </div>
                           </div>
 
                           {/* Product Details */}
                           <div className="flex-grow">
-                            <div className="flex justify-between items-start mb-2">
-                              <div>
-                                <h4 className="font-bold text-lg text-gray-800 mb-1">{item.product.name}</h4>
-                                <p className="text-orange-600 font-semibold text-lg">₹{item.product.price}</p>
+                            <div className="flex justify-between items-start">
+                              <div className="flex-grow">
+                                <h4 className="font-semibold text-gray-900 mb-1">{item.product.name}</h4>
+                                <p className="text-orange-600 font-bold">₹{item.product.price}</p>
                               </div>
-                              <div className="text-right">
-                                <p className="font-bold text-xl text-gray-800">₹{(item.product.price * item.quantity).toFixed(2)}</p>
+                              <div className="text-right ml-4">
+                                <p className="font-bold text-lg text-gray-900">₹{(item.product.price * item.quantity).toFixed(2)}</p>
                                 {item.quantity > 1 && (
                                   <p className="text-sm text-gray-500">{item.quantity} × ₹{item.product.price}</p>
                                 )}
                               </div>
                             </div>
 
-                            {/* Enhanced Product Features */}
-                            <div className="mb-4">
-                              <motion.div 
-                                className="flex flex-wrap gap-3"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: index * 0.05 }}
-                              >
-                                <motion.div
-                                  whileHover={{ scale: 1.05, y: -2 }}
-                                  className="flex items-center gap-2 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 px-3 py-2 rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
-                                >
-                                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                  <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                  </svg>
-                                  <span className="text-sm font-semibold text-green-800">✓ Fresh</span>
-                                </motion.div>
-                                
-                                <motion.div
-                                  whileHover={{ scale: 1.05, y: -2 }}
-                                  className="flex items-center gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 px-3 py-2 rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
-                                >
-                                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                  </svg>
-                                  <span className="text-sm font-semibold text-blue-800">🚚 Express Delivery</span>
-                                </motion.div>
-                                
-                                <motion.div
-                                  whileHover={{ scale: 1.05, y: -2 }}
-                                  className="flex items-center gap-2 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 px-3 py-2 rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
-                                >
-                                  <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
-                                  <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.175 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                  </svg>
-                                  <span className="text-sm font-semibold text-amber-800">⭐ Premium Quality</span>
-                                </motion.div>
-                              </motion.div>
-                            </div>
-
-                            {/* Enhanced Quantity Controls & Actions */}
-                            <div className="space-y-3">
-                              {/* Quantity Control */}
-                              <motion.div 
-                                className="flex items-center justify-between bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-3 border border-orange-200"
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: index * 0.1 }}
-                              >
-                                <div className="flex items-center gap-3">
-                                  <span className="text-sm font-semibold text-gray-700">Quantity:</span>
-                                  <div className="flex items-center bg-white rounded-lg shadow-inner border border-orange-200">
-                                    <Button 
-                                      variant="outline" 
-                                      size="sm"
-                                      className="h-9 w-9 p-0 hover:bg-orange-50 hover:border-orange-300 rounded-l-lg transition-all duration-200"
-                                      onClick={() => item.id && updateQuantity(item.id, item.quantity - 1)}
-                                      disabled={item.quantity <= 1}
-                                      aria-label="Decrease quantity"
-                                    >
-                                      <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4" />
-                                      </svg>
-                                    </Button>
-                                    <Input
-                                      type="number"
-                                      className="w-16 text-center border-0 bg-transparent font-bold text-lg text-gray-800 focus:ring-0 focus:outline-none"
-                                      value={item.quantity}
-                                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
-                                        item.id && updateQuantity(item.id, Math.max(1, parseInt(e.target.value || '1')))
-                                      }
-                                      min={1}
-                                    />
-                                    <Button 
-                                      variant="outline" 
-                                      size="sm"
-                                      className="h-9 w-9 p-0 hover:bg-orange-50 hover:border-orange-300 rounded-r-lg transition-all duration-200"
-                                      onClick={() => item.id && updateQuantity(item.id, item.quantity + 1)}
-                                      aria-label="Increase quantity"
-                                    >
-                                      <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                      </svg>
-                                    </Button>
-                                  </div>
-                                </div>
-                                
-                                <div className="text-right">
-                                  <p className="text-lg font-bold text-gray-800">₹{(item.product.price * item.quantity).toFixed(2)}</p>
-                                  <p className="text-xs text-gray-500">₹{item.product.price} each</p>
-                                </div>
-                              </motion.div>
-
-                              {/* Action Buttons */}
-                              <motion.div 
-                                className="flex gap-3"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: index * 0.15 }}
+                            {/* Ultra Minimal Quantity Controls - Plain Grid */}
+                            <div className="grid grid-cols-3 gap-4 mt-3">
+                              {/* Decrease Button */}
+                              <motion.div
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="flex justify-center"
                               >
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="flex-1 text-amber-700 border-amber-200 hover:bg-amber-50 hover:border-amber-300 hover:shadow-md transition-all duration-200 font-medium"
-                                  onClick={() => item.id && saveForLater(item.id)}
+                                  className="h-8 w-8 p-0 text-gray-600 hover:text-orange-600 hover:bg-orange-50 border-0"
+                                  onClick={() => item.id && updateQuantity(item.id, item.quantity - 1)}
+                                  disabled={item.quantity <= 1}
                                 >
-                                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4" />
                                   </svg>
-                                  Save for Later
-                                </Button>
-
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="flex-1 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 hover:shadow-md transition-all duration-200 font-medium"
-                                  onClick={() => item.id && removeFromCart(item.id)}
-                                >
-                                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                  </svg>
-                                  Remove
                                 </Button>
                               </motion.div>
-                            </div>
 
-                            {/* Additional Product Info */}
-                            <AnimatePresence>
-                              {expandedItems.includes(item.id!) && (
+                              {/* Quantity Display */}
+                              <div className="flex items-center justify-center">
+                                <span className="text-sm font-medium text-gray-900">{item.quantity}</span>
+                              </div>
+
+                              {/* Increase Button & Remove Button */}
+                              <div className="flex items-center justify-center gap-2">
                                 <motion.div
-                                  initial={{ opacity: 0, height: 0 }}
-                                  animate={{ opacity: 1, height: 'auto' }}
-                                  exit={{ opacity: 0, height: 0 }}
-                                  className="mt-4 p-4 bg-gray-50 rounded-lg"
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
                                 >
-                                  <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                      <p className="text-gray-600">Delivery</p>
-                                      <p className="font-medium text-green-600">Tomorrow by 10 PM</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-gray-600">Stock</p>
-                                      <p className="font-medium text-green-600">Available</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-gray-600">Weight</p>
-                                      <p className="font-medium">250g</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-gray-600">Shelf Life</p>
-                                      <p className="font-medium">7 days</p>
-                                    </div>
-                                  </div>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-gray-600 hover:text-orange-600 hover:bg-orange-50 border-0"
+                                    onClick={() => item.id && updateQuantity(item.id, item.quantity + 1)}
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                  </Button>
                                 </motion.div>
-                              )}
-                            </AnimatePresence>
+                                
+                                <motion.div
+                                  whileHover={{ scale: 1.1 }}
+                                  whileTap={{ scale: 0.9 }}
+                                >
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 border-0"
+                                    onClick={() => item.id && removeFromCart(item.id)}
+                                    title="Remove item"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  </Button>
+                                </motion.div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </motion.div>
@@ -472,22 +341,6 @@ export default function CartPage() {
                 </div>
               </motion.div>
 
-              {/* Saved for Later Section */}
-              {savedForLater.length > 0 && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-2xl shadow-lg p-6"
-                >
-                  <h3 className="text-xl font-bold text-gray-800 mb-4">Saved for Later</h3>
-                  <div className="text-sm text-gray-600">
-                    You have {savedForLater.length} item(s) saved. 
-                    <Button variant="link" className="p-0 ml-2 text-orange-600">
-                      View all saved items
-                    </Button>
-                  </div>
-                </motion.div>
-              )}
             </div>
 
             {/* Order Summary Sidebar */}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { supabase } from "../../lib/supabaseClient";
+import { fetchCarouselProducts } from "../lib/productService";
 import Link from "next/link";
 
 interface Product {
@@ -12,8 +12,8 @@ interface Product {
   description: string;
   price: number;
   category: string;
-  spice_level: 'mild' | 'medium' | 'hot' | 'extra_hot';
-  is_vegetarian: boolean;
+  spice_level?: 'mild' | 'medium' | 'hot' | 'extra_hot';
+  is_vegetarian?: boolean;
   stock: number;
   image_url: string | null;
   created_at?: string;
@@ -27,7 +27,7 @@ const SPICE_LEVELS = {
 };
 
 const ProductCard = ({ product, index }: { product: Product; index: number }) => {
-  const spiceInfo = SPICE_LEVELS[product.spice_level] || SPICE_LEVELS.mild;
+  // Using SPICE_LEVELS directly where needed
   
   return (
     <motion.div
@@ -134,41 +134,22 @@ export default function ProductShowcase() {
       setLoading(true);
       setError(null);
       
-      // First try with test_products
-      let tableName = 'test_products';
-      let { data, error } = await supabase
-        .from(tableName)
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(3); // Show only 3 featured products
-
-      // If that fails with a relation error, try with products table
-      if (error && error.code === '42P01') { // 42P01 is the code for "relation does not exist"
-        console.log('test_products not found, trying products table...');
-        tableName = 'products';
-        const result = await supabase
-          .from(tableName)
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(3); // Show only 3 featured products
-        
-        data = result.data;
-        error = result.error;
-      }
-
-      if (error) {
-        console.error('Supabase query error:', error);
-        throw new Error(`Unable to fetch products. Please check your database setup.`);
-      }
+      console.log('Fetching carousel products from mock data...');
       
-      console.log('Fetched products:', data);
-      setProducts(data || []);
-    } catch (err) {
-      if (!(err instanceof Error)) {
-        throw new Error(`Unexpected error type: ${typeof err}`);
+      // Use mock data service
+      const products = await fetchCarouselProducts();
+      
+      console.log('Fetched products:', products);
+      console.log('Number of products found:', products.length);
+      
+      if (products.length === 0) {
+        setError('No products available at the moment.');
+      } else {
+        setProducts(products);
       }
-      console.error('Error in fetchProducts:', err);
-      setError(err.message || 'Failed to load products. Please try again later.');
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError(`Error loading products: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }

@@ -167,6 +167,46 @@ export const deleteCartItem = async (
   }
 };
 
+export interface OrderItem {
+  product_id: number;
+  quantity: number;
+  price: number;
+}
+
+export const createOrder = async (items: OrderItem[], total: number) => {
+  try {
+    // Create order in database
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .insert([{ 
+        total_amount: total,
+        status: 'Pending'
+      }])
+      .select()
+      .single();
+
+    if (orderError || !order) {
+      throw orderError || new Error('Failed to create order');
+    }
+
+    // Create order items
+    const { error: itemsError } = await supabase
+      .from('order_items')
+      .insert(items.map(item => ({
+        order_id: order.id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        price: item.price
+      })));
+
+    if (itemsError) throw itemsError;
+    return order;
+  } catch (error) {
+    console.error('Error creating order:', error);
+    throw error;
+  }
+};
+
 export const clearCart = async (): Promise<boolean> => {
   try {
     // Try Supabase first

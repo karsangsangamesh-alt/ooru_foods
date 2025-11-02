@@ -6,6 +6,7 @@ import Footer from "./components/Footer";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import { ToastProvider } from "./components/Toast";
+import PerformanceDashboard from "./components/PerformanceDashboard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,15 +41,16 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-light-50 text-dark-800`}
       >
         <AuthProvider>
-          <CartProvider>
-            <ToastProvider>
+          <ToastProvider>
+            <CartProvider>
               <Header />
               <main className="min-h-screen">
                 {children}
               </main>
               <Footer />
-            </ToastProvider>
-          </CartProvider>
+              <PerformanceDashboard />
+            </CartProvider>
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>

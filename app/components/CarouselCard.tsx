@@ -1,9 +1,11 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { CarouselProduct } from '../lib/productService';
+import { getImageUrl } from '../../lib/supabaseImage';
 
 interface CarouselCardProps {
   product: CarouselProduct;
@@ -22,16 +24,19 @@ const getSpiceLevelColor = (level?: string) => {
   }
 };
 
-const getImageUrl = (imageUrl: string | null) => {
-  // If no image_url provided, use placeholder
-  if (!imageUrl) {
-    return '/placeholder-food.svg';
-  }
-  return imageUrl;
-};
+const CarouselCard = React.memo(({ 
+  product, 
+  onCardClick 
+}: Omit<CarouselCardProps, 'index' | 'isCenter'>) => {
 
-export default function CarouselCard({ product, index, isCenter, onCardClick }: CarouselCardProps) {
   const router = useRouter();
+  const [imageStatus, setImageStatus] = useState<'loading' | 'loaded' | 'error'>(
+    product.image_url ? 'loading' : 'error'
+  );
+  const [showFallback, setShowFallback] = useState(!product.image_url);
+  
+  // Get the image URL - the getImageUrl function now handles all the logic
+  const imageUrl = product.image_url ? getImageUrl(product.image_url) : '/placeholder-food.svg';
 
   const handleClick = () => {
     if (onCardClick) {
@@ -41,7 +46,7 @@ export default function CarouselCard({ product, index, isCenter, onCardClick }: 
     }
   };
 
-  // Simple card animation variants (removed 3D positioning)
+  // Simple card animation variants
   const cardVariants = {
     hidden: {
       opacity: 0,
@@ -83,19 +88,46 @@ export default function CarouselCard({ product, index, isCenter, onCardClick }: 
       `}>
         
         {/* Background Image */}
-        <div className="absolute inset-0">
-          <motion.img
-            src={getImageUrl(product.image_url)}
-            alt={product.name}
-            className="w-full h-full object-cover"
-            loading="lazy"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.3 }}
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = '/placeholder-food.svg';
-            }}
-          />
+        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center overflow-hidden">
+{showFallback || !product.image_url ? (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+              <div className="text-center p-4">
+                <div className="text-gray-500 font-medium">No Image Available</div>
+                <div className="text-xs mt-1 text-gray-400">{product.name}</div>
+              </div>
+            </div>
+          ) : (
+            <Image
+              src={imageUrl}
+              alt={product.name}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover transition-opacity duration-300"
+              onLoadingComplete={() => setImageStatus('loaded')}
+              onError={() => {
+                if (imageUrl.includes('supabase.co')) {
+                  console.warn('Image not found in Supabase storage:', imageUrl);
+                } else {
+                  console.error('Failed to load image:', imageUrl);
+                }
+                setImageStatus('error');
+                setShowFallback(true);
+              }}
+              style={{
+                opacity: imageStatus === 'loaded' ? 1 : 0,
+                transition: 'opacity 0.3s ease-in-out',
+              }}
+              priority={false}
+              unoptimized={process.env.NODE_ENV !== 'production'} // Optimize in production
+            />
+          )}
+          
+          {/* Loading overlay */}
+          {imageStatus === 'loading' && (
+            <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
+              <div className="animate-pulse text-gray-500">Loading...</div>
+            </div>
+          )}
         </div>
 
         {/* Gradient Overlay for Title */}
@@ -176,4 +208,9 @@ export default function CarouselCard({ product, index, isCenter, onCardClick }: 
       </div>
     </motion.div>
   );
-}
+});
+
+// Add display name for debugging
+CarouselCard.displayName = 'CarouselCard';
+
+export default CarouselCard;

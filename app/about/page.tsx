@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { useInView } from 'framer-motion';
-import Footer from '../components/Footer';
 import { Button } from '../components/ui/button';
 import { 
   Heart, 
@@ -560,10 +559,6 @@ export default function AboutPage() {
           </div>
         </div>
       </motion.section>
-
-      
-        
-      <Footer />
     </>
   );
 }

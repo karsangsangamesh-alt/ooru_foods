@@ -17,12 +17,12 @@ interface ProductCardProps {
   loadingItemId?: string | null;
 }
 
-export default function ProductCard({ product, index, onAddToCart, loadingItemId }: ProductCardProps) {
+const ProductCard = React.memo(function ProductCard({ product, index, onAddToCart, loadingItemId }: ProductCardProps) {
   const { addToCart } = useCart();
   const [isAdding, setIsAdding] = useState(false);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent navigation when clicking add to cart
+    e.stopPropagation();
     if (onAddToCart) {
       try {
         setIsAdding(true);
@@ -31,7 +31,6 @@ export default function ProductCard({ product, index, onAddToCart, loadingItemId
         setIsAdding(false);
       }
     } else {
-      // Only call addToCart if it's a SupabaseProduct
       if ('created_at' in product || typeof product.id === 'number') {
         addToCart(product as SupabaseProduct);
       }
@@ -40,7 +39,7 @@ export default function ProductCard({ product, index, onAddToCart, loadingItemId
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
-    target.src = '/placeholder-food.svg'; // Create a placeholder image
+    target.src = '/placeholder-food.svg';
   };
 
   return (
@@ -142,4 +141,6 @@ export default function ProductCard({ product, index, onAddToCart, loadingItemId
       </div>
     </motion.div>
   );
-}
+});
+
+export default ProductCard;

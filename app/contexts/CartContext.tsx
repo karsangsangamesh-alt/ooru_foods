@@ -1,11 +1,15 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import { useToast } from '../components/Toast';
 import { Product } from '../../lib/supabaseClient';
 import * as cartService from '../lib/cartService';
 
-export interface CartItem extends cartService.CartItem {
+export interface CartItem extends Omit<cartService.CartItem, 'id'> {
   product: Product;
+  id: string; // Make id required in this context
+  product_id: number;
+  quantity: number;
 }
 
 interface CartContextType {
@@ -33,51 +37,93 @@ export function useCart() {
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const { showToast } = useToast();
 
-  const initializeCart = async () => {
+  const initializeCart = useCallback(async () => {
     try {
+      setLoading(true);
       const cartItems = await cartService.getCartItems();
       
-      if (!cartItems || cartItems.length === 0) {
+      if (!cartItems?.length) {
         setItems([]);
         return;
       }
       
-      // Fetch product details for each cart item
-      const products = await Promise.all(
-        cartItems.map(async (item) => {
-          try {
-            const { data, error } = await cartService.supabase
-              .from('test_products')
-              .select('*')
-              .eq('id', item.product_id)
-              .single();
-            
-            if (error) {
-              console.error(`Error fetching product ${item.product_id}:`, error);
-              return null;
-            }
-            return data;
-          } catch (err) {
-            console.error(`Error processing product ${item.product_id}:`, err);
+      // Batch fetch all products in cart
+      const productIds = cartItems.map((item: cartService.CartItem) => item.product_id);
+      let products = [];
+      let error = null;
+      
+      try {
+        // First try enhanced_products table
+        const { data, error: dbError } = await cartService.supabase
+          .from('enhanced_products')
+          .select('*')
+          .in('id', productIds);
+        
+        if (dbError) {
+          console.log('enhanced_products not found, trying products table');
+          // Fallback to products table
+          const result = await cartService.supabase
+            .from('products')
+            .select('*')
+            .in('id', productIds);
+          
+          products = result.data || [];
+          error = result.error;
+        } else {
+          products = data || [];
+        }
+      } catch (dbError) {
+        console.log('Database error, using empty products list');
+        // No fallback to mock data - database should be the source of truth
+        products = [];
+        error = dbError;
+      }
+      
+      if (error) {
+        console.log('Database error, using fallback products');
+      }
+
+      // Create product map for efficient lookup
+      const productMap = new Map(products.map((p) => [p.id, p]));
+      
+      // If no products found, clear the cart to prevent future issues
+      if (products.length === 0 && cartItems.length > 0) {
+        console.log('No products found in database, clearing cart');
+        await cartService.clearCart();
+        showToast('Cart cleared - database does not contain the products from your cart', 'info');
+        setItems([]);
+        return;
+      }
+      
+      // Merge cart items with products
+      const mergedItems = cartItems
+        .map((item: cartService.CartItem) => {
+          const product = productMap.get(item.product_id);
+          // Ensure id is always a string by providing a fallback
+          const itemId = item.id || `temp-${Math.random().toString(36).substr(2, 9)}`;
+          
+          if (product) {
+            return { 
+              ...item, 
+              product,
+              id: itemId,
+              product_id: item.product_id,
+              quantity: item.quantity
+            };
+          } else {
+            // Log the missing product for debugging
+            console.log(`Product ${item.product_id} not found in database, removing from cart`);
             return null;
           }
         })
-      );
+        .filter((item): item is CartItem => item !== null);
 
-      // Filter out any null products and merge with cart items
-      const validProducts = products.filter((product): product is Product => product !== null);
-      
-      if (validProducts.length !== cartItems.length) {
-        console.warn('Some products could not be loaded and were removed from the cart');
+      if (mergedItems.length !== cartItems.length) {
+        const missingCount = cartItems.length - mergedItems.length;
+        showToast(`${missingCount} product${missingCount > 1 ? 's' : ''} not found in database and removed from cart`, 'info');
       }
-
-      const mergedItems = cartItems
-        .map((item, index) => ({
-          ...item,
-          product: products[index]
-        }))
-        .filter(item => item.product != null); // Remove items with missing products
 
       setItems(mergedItems);
     } catch (error) {
@@ -87,18 +133,34 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showToast]);
 
   useEffect(() => {
     initializeCart();
-  }, []);
+  }, [initializeCart]);
 
-  const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const total = items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+  const cartCount = useMemo(() => 
+    items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0), 
+    [items]
+  );
+  
+  const total = useMemo(() => 
+    items.reduce((sum: number, item: CartItem) => sum + (item.product.price * item.quantity), 0), 
+    [items]
+  );
 
   const addToCart = async (product: Product, quantity = 1) => {
     try {
       const cartItem = await cartService.addToCart(product, quantity);
+      // Ensure the id is always defined
+      const newItem: CartItem = {
+        ...cartItem,
+        id: cartItem.id || `temp-${Math.random().toString(36).substr(2, 9)}`,
+        product,
+        product_id: product.id,
+        quantity: cartItem.quantity
+      };
+      
       setItems(prevItems => {
         const existingItem = prevItems.find(item => item.product_id === product.id);
         if (existingItem) {
@@ -108,7 +170,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               : item
           );
         }
-        return [...prevItems, { ...cartItem, product }];
+        return [...prevItems, newItem];
       });
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -152,31 +214,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const checkout = async () => {
     try {
-      if (items.length === 0) throw new Error('Cart is empty');
+      if (items.length === 0) {
+        throw new Error('Cart is empty');
+      }
       
-      // Create order in database
-      const { data: order } = await cartService.supabase
-        .from('orders')
-        .insert([{ 
-          total_amount: total,
-          status: 'Pending'
-        }])
-        .select()
-        .single();
-
-      if (!order) throw new Error('Failed to create order');
-      
-      // Create order items
-      await cartService.supabase
-        .from('order_items')
-        .insert(items.map(item => ({
-          order_id: order.id,
-          product_id: item.product_id,
-          quantity: item.quantity,
-          price: item.product.price
-        })));
-
-      // Clear cart after successful checkout
+      const orderItems = items.map(item => ({
+        product_id: item.product_id,
+        quantity: item.quantity,
+        price: item.product.price
+      }));
+      const order = await cartService.createOrder(orderItems, total);
+      showToast('Order placed successfully!', 'success');
       await clearCart();
       return order;
     } catch (error) {

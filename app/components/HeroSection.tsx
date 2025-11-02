@@ -1,20 +1,9 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useState, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { CarouselProduct } from "../lib/productService";
+import { motion } from "framer-motion";
 import Carousel3D from "./Carousel3D";
 
-// Placeholder chutney names for dynamic overlay (will fetch from Supabase later)
-const CHUTNEY_VARIETIES = [
-  "Groundnut Pudi",
-  "Coconut Pudi", 
-  "Red Chili Pudi",
-  "Curry Leaves Pudi",
-  "Coriander Pudi",
-  "Mint Pudi"
-];
+// Animation variants for interactive elements
 
 // Framer Motion variants (simplified to avoid TypeScript conflicts)
 const containerVariants = {
@@ -54,71 +43,15 @@ const buttonVariants = {
   }
 };
 
-const pulseVariants = {
-  hover: {
-    boxShadow: "0 0 0 0 rgba(198, 40, 40, 0.7)",
-    transition: {
-      duration: 1.5,
-      repeat: Infinity,
-      repeatType: "reverse" as const
-    }
-  }
-};
+// Animation variants for interactive elements
 
 export default function HeroSection() {
-  const [currentChutneyIndex, setCurrentChutneyIndex] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const productRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll();
-  
-  // Parallax effects
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
-  const productY = useTransform(scrollYProgress, [0, 1], ['0%', '-20%']);
-
-  // Dynamic chutney name rotation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentChutneyIndex((prev) => (prev + 1) % CHUTNEY_VARIETIES.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Parallax tilt effect on mouse move
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!productRef.current) return;
-    
-    const rect = productRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    const mouseX = e.clientX - centerX;
-    const mouseY = e.clientY - centerY;
-    
-    const rotateX = (mouseY / rect.height) * 10; // Max 10 degrees
-    const rotateY = (mouseX / rect.width) * 10; // Max 10 degrees
-    
-    productRef.current.style.transform = `
-      perspective(1000px) 
-      rotateX(${rotateX}deg) 
-      rotateY(${rotateY}deg)
-      scale(${isHovered ? 1.05 : 1})
-    `;
-  };
-
-  const handleMouseEnter = () => setIsHovered(true);
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    if (productRef.current) {
-      productRef.current.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)';
-    }
-  };
+  // Removed unused chutney rotation logic to improve performance
 
   const headlineWords = "Authentic South Indian Chutney Pudi".split(" ");
 
   return (
     <section 
-      ref={sectionRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#fef9f7]"
     >
       {/* Simple Plain Background */}

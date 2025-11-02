@@ -2,7 +2,6 @@
 
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Footer from '../components/Footer';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { 
@@ -1140,7 +1139,6 @@ export default function ContactPage() {
           </motion.div>
         </motion.section>
       </div>
-      <Footer />
     </>
   );
 }

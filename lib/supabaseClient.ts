@@ -17,6 +17,21 @@ export interface Product {
   is_vegetarian?: boolean
   stock: number
   created_at?: string
+  
+  // Additional properties for cart functionality
+  ingredients?: string[]
+  cooking_tips?: string[]
+  nutrition_facts?: {
+    calories: string
+    protein: string
+    carbs: string
+    fat: string
+  }
+  rating?: number
+  reviews_count?: number
+  tags?: string[]
+  in_stock?: boolean
+  featured?: boolean
 }
 
 // Legacy interface for existing test products

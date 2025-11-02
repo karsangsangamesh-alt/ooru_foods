@@ -21,7 +21,6 @@ export default function Carousel3D({
   const [products, setProducts] = useState<CarouselProduct[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAutoRotating, setIsAutoRotating] = useState(true);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -45,14 +44,14 @@ export default function Carousel3D({
 
   // Auto-rotation functionality
   useEffect(() => {
-    if (!enableAutoRotate || !isAutoRotating || products.length === 0) return;
+    if (!enableAutoRotate || products.length === 0) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % products.length);
     }, autoRotateInterval);
 
     return () => clearInterval(interval);
-  }, [enableAutoRotate, isAutoRotating, products.length, autoRotateInterval]);
+  }, [enableAutoRotate, products.length, autoRotateInterval]);
 
   // Touch handlers for swipe gestures
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -107,11 +106,7 @@ export default function Carousel3D({
     setDragStart(null);
   };
 
-  // Navigation functions
-  const goToNext = useCallback(() => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % products.length);
-  }, [products.length]);
-
+  // Navigation function
   const goToSlide = useCallback((index: number) => {
     setCurrentIndex(index);
   }, []);
@@ -185,8 +180,6 @@ export default function Carousel3D({
               <div className="w-full max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg h-full">
                 <CarouselCard
                   product={products[currentIndex]}
-                  index={0}
-                  isCenter={true}
                   onCardClick={() => handleProductSelect(products[currentIndex])}
                 />
               </div>
