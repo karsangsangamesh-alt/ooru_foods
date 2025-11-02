@@ -344,7 +344,7 @@ function ShopPage() {
                     className="relative group flex-shrink-0"
                     aria-label={`Select ${category.name} category`}
                   >
-                    {/* Mobile-First Outer Ring - Fixed size to prevent edge cutting */}
+                    {/* Mobile-First Outer Ring - Icon only inside circle */}
                     <motion.div
                       className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 rounded-full bg-gradient-to-br ${category.color} p-1 shadow-xl`}
                       animate={{
@@ -355,37 +355,32 @@ function ShopPage() {
                       transition={{ duration: 0.3 }}
                     >
                       {/* Inner Circle */}
-                      <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center p-1">
-                        <Icon className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-8 lg:h-8 mb-0.5 sm:mb-1 ${
+                      <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
+                        <Icon className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 ${
                           isSelected ? 'text-orange-500' : 'text-gray-600'
                         }`} />
-                        <span className={`text-xs sm:text-sm md:text-base font-semibold text-center leading-tight ${
-                          isSelected ? 'text-orange-500' : 'text-gray-700'
-                        }`}>
-                          {category.name}
-                        </span>
                       </div>
                     </motion.div>
 
-                    {/* Selection Indicator */}
+                    {/* Selection Indicator - More visible and positioned better */}
                     {isSelected && (
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="absolute -top-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 bg-orange-500 rounded-full flex items-center justify-center"
+                        className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-orange-500 rounded-full flex items-center justify-center shadow-lg"
                       >
-                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full" />
+                        <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 bg-white rounded-full" />
                       </motion.div>
                     )}
 
-                    {/* Category Description - Hidden on mobile, visible on larger screens */}
+                    {/* Category Text Below Circle - Always visible with better spacing */}
                     <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: isSelected ? 1 : 0 }}
-                      className="absolute -bottom-6 sm:-bottom-8 md:-bottom-10 left-1/2 transform -translate-x-1/2 whitespace-nowrap hidden md:block"
+                      className="text-center mt-2 sm:mt-3"
                     >
-                      <p className="text-xs text-gray-500 text-center max-w-20 sm:max-w-24">
-                        {category.description}
+                      <p className={`text-xs sm:text-sm md:text-base font-semibold ${
+                        isSelected ? 'text-orange-500' : 'text-gray-700'
+                      }`}>
+                        {category.name}
                       </p>
                     </motion.div>
                   </motion.button>
@@ -581,11 +576,12 @@ function ProductCard({ product, index, onProductClick, onAddToCart, addingToCart
               whileTap={{ scale: 0.95 }}
               onClick={(e) => onAddToCart(product, e)}
               disabled={addingToCart === product.id.toString() || isOutOfStock}
-              className={`px-4 py-2 rounded-full font-semibold flex items-center space-x-2 transition-all duration-200 disabled:opacity-50 ${
+              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 ${
                 isOutOfStock 
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600'
+                  : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 shadow-lg'
               }`}
+              title={isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
             >
               {addingToCart === product.id.toString() ? (
                 <motion.div
@@ -594,12 +590,9 @@ function ProductCard({ product, index, onProductClick, onAddToCart, addingToCart
                   className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
                 />
               ) : isOutOfStock ? (
-                <span>Out of Stock</span>
+                <span className="text-xs">✕</span>
               ) : (
-                <>
-                  <Plus className="w-4 h-4" />
-                  <span>Add</span>
-                </>
+                <Plus className="w-5 h-5" />
               )}
             </motion.button>
           </div>
