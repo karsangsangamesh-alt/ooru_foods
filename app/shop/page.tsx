@@ -408,25 +408,52 @@ function ShopPage() {
             </p>
           </motion.div>
 
-          {/* Products Grid - Lazy loaded */}
+          {/* Products Grid - Horizontal Scrolling Layout */}
           <Suspense fallback={<ShopLoader />}>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 1 }}
-              className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 xl:gap-8"
+              className="relative"
             >
-              {filteredProducts.map((product, index) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  index={index}
-                  onProductClick={handleProductClick}
-                  onAddToCart={handleAddToCart}
-                  addingToCart={addingToCart}
-                  getSpiceLevelDisplay={getSpiceLevelDisplay}
-                />
-              ))}
+              {/* Horizontal Scroll Container */}
+              <div className="overflow-x-auto pb-4 scrollbar-hide">
+                <div className="flex gap-3 sm:gap-4 lg:gap-6 min-w-max px-4">
+                  {filteredProducts.map((product, index) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, x: 50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex-shrink-0"
+                      style={{
+                        width: 'calc(25% - 0.5rem)', // 4 products per screen
+                        minWidth: '140px', // Minimum width for small screens
+                        maxWidth: '200px' // Maximum width for larger screens
+                      }}
+                    >
+                      <ProductCard
+                        product={product}
+                        index={index}
+                        onProductClick={handleProductClick}
+                        onAddToCart={handleAddToCart}
+                        addingToCart={addingToCart}
+                        getSpiceLevelDisplay={getSpiceLevelDisplay}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Scroll Indicator */}
+              <div className="flex justify-center mt-4 space-x-1">
+                {Array.from({ length: Math.ceil(filteredProducts.length / 4) }).map((_, pageIndex) => (
+                  <div
+                    key={pageIndex}
+                    className="w-2 h-2 rounded-full bg-gray-300"
+                  />
+                ))}
+              </div>
             </motion.div>
           </Suspense>
 
