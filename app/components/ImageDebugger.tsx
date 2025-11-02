@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../../lib/supabaseClient';
 
 interface ImageDebuggerProps {
   productId: number;
@@ -47,7 +47,7 @@ export default function ImageDebugger({ productId, imageUrl }: ImageDebuggerProp
           : `${baseUrl}/storage/v1/object/public/${bucket}/${imageUrl.replace(/^\//, '')}`;
 
         // 2. Check if the file exists in Supabase Storage
-        const { data: fileData, error: fileError } = await supabase.storage
+        const fileData = await supabase.storage
           .from(bucket)
           .getPublicUrl(imageUrl.replace(/^\//, ''));
 
@@ -72,7 +72,6 @@ export default function ImageDebugger({ productId, imageUrl }: ImageDebuggerProp
           publicUrl,
           isAccessible,
           fileData,
-          fileError,
           responseStatus: response.status,
         });
       } catch (error) {

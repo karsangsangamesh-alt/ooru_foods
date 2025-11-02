@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Carousel3D from "./Carousel3D";
+import { CarouselProduct } from "../lib/productService";
 
 // Animation variants for interactive elements
 
