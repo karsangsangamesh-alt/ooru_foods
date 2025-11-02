@@ -434,43 +434,102 @@ export default function ReviewSection() {
           </motion.p>
         </motion.div>
 
-        {/* Stats */}
+        {/* Mobile-First Horizontal Scroll Stats */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.3, duration: 0.8 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-12 md:mb-16 lg:mb-20"
+          className="mb-12 md:mb-16 lg:mb-20"
         >
-          {[
-            { label: "Happy Customers", value: "10,000+", icon: "😊" },
-            { label: "5-Star Reviews", value: "4.8/5", icon: "⭐" },
-            { label: "Products Sold", value: "50,000+", icon: "📦" },
-            { label: "Repeat Customers", value: "85%", icon: "🔄" }
-          ].map((stat, index) => (
-            <motion.div 
-              key={index} 
-              className="text-center group"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 + index * 0.1 }}
-              whileHover={{ y: -5 }}
-            >
+          {/* Mobile Scroll Hint */}
+          <div className="block lg:hidden text-center mb-4">
+            <p className="text-xs text-gray-500 flex items-center justify-center space-x-2">
+              <span>← Swipe to see our achievements →</span>
+            </p>
+          </div>
+          
+          {/* Mobile Horizontal Scroll */}
+          <div className="block lg:hidden">
+            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 px-2 snap-x snap-mandatory">
+              {[
+                { label: "Happy Customers", value: "10,000+", icon: "😊" },
+                { label: "5-Star Reviews", value: "4.8/5", icon: "⭐" },
+                { label: "Products Sold", value: "50,000+", icon: "📦" },
+                { label: "Repeat Customers", value: "85%", icon: "🔄" }
+              ].map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ 
+                    delay: 0.5 + index * 0.1,
+                    duration: 0.5,
+                    type: 'spring',
+                    stiffness: 100
+                  }}
+                  className="flex-none w-[200px] snap-start"
+                >
+                  <motion.div 
+                    className="bg-white rounded-2xl p-6 shadow-lg border border-orange-100 text-center group h-full"
+                    whileHover={{ 
+                      y: -8,
+                      scale: 1.02,
+                      transition: { duration: 0.3 }
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <motion.div 
+                      className="text-3xl mb-3"
+                      whileHover={{ scale: 1.2, rotate: 10 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {stat.icon}
+                    </motion.div>
+                    <div className="text-2xl font-bold text-gray-900 mb-2">
+                      {stat.value}
+                    </div>
+                    <div className="text-sm text-gray-600 group-hover:text-orange-600 transition-colors">
+                      {stat.label}
+                    </div>
+                  </motion.div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Desktop Grid Layout */}
+          <div className="hidden lg:grid grid-cols-4 gap-8">
+            {[
+              { label: "Happy Customers", value: "10,000+", icon: "😊" },
+              { label: "5-Star Reviews", value: "4.8/5", icon: "⭐" },
+              { label: "Products Sold", value: "50,000+", icon: "📦" },
+              { label: "Repeat Customers", value: "85%", icon: "🔄" }
+            ].map((stat, index) => (
               <motion.div 
-                className="text-2xl md:text-3xl mb-2 md:mb-3"
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                transition={{ duration: 0.3 }}
+                key={index} 
+                className="text-center group"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 + index * 0.1 }}
+                whileHover={{ y: -5 }}
               >
-                {stat.icon}
+                <motion.div 
+                  className="text-3xl mb-3"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {stat.icon}
+                </motion.div>
+                <div className="text-3xl font-bold text-gray-900 mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-sm text-gray-600 group-hover:text-gray-800 transition-colors">
+                  {stat.label}
+                </div>
               </motion.div>
-              <div className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-1">
-                {stat.value}
-              </div>
-              <div className="text-xs md:text-sm text-gray-600 group-hover:text-gray-800 transition-colors">
-                {stat.label}
-              </div>
-            </motion.div>
-          ))}
+            ))}
+          </div>
         </motion.div>
 
         {/* Enhanced Infinite Scroll Reviews */}
