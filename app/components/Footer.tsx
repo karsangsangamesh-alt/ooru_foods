@@ -89,8 +89,8 @@ export default function Footer() {
 
   return (
     <footer className="bg-gradient-to-b from-gray-900 to-gray-800 text-white border-t border-gray-700">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 max-w-7xl mx-auto">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12">
           {/* Brand Section */}
           <div className="lg:col-span-2 space-y-8">
             <motion.div
@@ -101,14 +101,14 @@ export default function Footer() {
             >
               <Link href="/" className="inline-block">
                 <motion.h3 
-                  className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent"
+                  className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   Ooru Chutneypudi
                 </motion.h3>
               </Link>
-              <p className="text-gray-300 max-w-md leading-relaxed text-sm md:text-base">
+              <p className="text-gray-300 max-w-lg mx-auto sm:mx-0 text-center sm:text-left leading-relaxed text-sm sm:text-base">
                 Bringing you authentic South Indian flavors with traditional chutneys 
                 and spicy delicacies crafted with love and heritage recipes.
               </p>
@@ -122,7 +122,7 @@ export default function Footer() {
               className="space-y-4"
             >
               <h4 className="text-lg font-semibold text-white">Connect With Us</h4>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex justify-center sm:justify-start flex-wrap gap-3">
                 {socialLinks.map((social, index) => (
                   <motion.a
                     key={social.name}
@@ -131,7 +131,7 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     whileHover={{ y: -3, scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="w-10 h-10 bg-gray-800 hover:bg-orange-500 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-orange-500/20"
+                    className="w-10 h-10 bg-gray-800 hover:bg-orange-500 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-orange-500/20 min-w-[44px] min-h-[44px]"
                     title={social.name}
                   >
                     {social.icon}

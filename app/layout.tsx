@@ -37,6 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-light-50 text-dark-800`}
       >

@@ -7,7 +7,8 @@ import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
 import LoginModal from "./LoginModal";
 import SearchBar from "./SearchBar";
-import { ShoppingCart, Bell, Menu, X, Search, User, LogOut, LogIn, ChevronUp, ChevronDown } from "lucide-react";
+import ChefSecrets from "./ChefSecrets";
+import { ShoppingCart, Bell, Menu, X, Search, User, LogOut, LogIn, ChevronUp, ChevronDown, ChefHat } from "lucide-react";
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -23,6 +24,7 @@ export default function Header() {
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [showHeader, setShowHeader] = useState(true);
+  const [isChefSecretsOpen, setIsChefSecretsOpen] = useState(false);
   const fullPlaceholder = 'Shenga chutney';
   
   // Smooth scroll tracking for header animation
@@ -227,25 +229,25 @@ export default function Header() {
               }}
             />
             
-            <div className="container mx-auto px-4 py-3 relative z-10">
-              <nav className="flex items-center justify-between min-h-[60px]">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 relative z-10">
+              <nav className="flex items-center justify-between min-h-[56px] sm:min-h-[64px]">
                 {/* Left Section - Logo with enhanced animations */}
                 <motion.div
                   initial={{ x: -50, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.1 }}
                   whileHover={{ 
-                    scale: 1.05
+                    scale: 1.02
                   }}
                   whileTap={{ 
-                    x: 5,
-                    transition: { duration: 0.2 }
+                    scale: 0.98,
+                    transition: { duration: 0.1 }
                   }}
-                  className="cursor-pointer select-none relative group"
+                  className="cursor-pointer select-none relative group flex-shrink-0"
                   onClick={() => router.push('/')}
                 >
                   <div className="flex flex-col overflow-hidden">
-                    <span className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-600 via-red-600 to-amber-600 bg-clip-text text-transparent">
+                    <span className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-orange-600 via-red-600 to-amber-600 bg-clip-text text-transparent leading-tight">
                       Ooru Foods
                     </span>
                   </div>
@@ -261,209 +263,106 @@ export default function Header() {
                   {/* Glow effect */}
                   <motion.div
                     className="absolute -inset-1 bg-gradient-to-r from-orange-600 via-red-600 to-amber-600 rounded-lg blur opacity-0 group-hover:opacity-20 transition-opacity duration-300"
-                    whileHover={{ opacity: 0.3 }}
+                    whileHover={{ opacity: 0.15 }}
                   />
                 </motion.div>
 
-                {/* Center Section - Desktop Navigation */}
-                <div className="hidden xl:flex items-center space-x-12 flex-1 justify-center">
-                  {navigation.map((item, index) => (
-                    <motion.button
-                      key={item}
-                      initial={{ opacity: 0, y: -20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 * (index + 2) }}
-                      whileHover={{ 
-                        y: -2,
-                        scale: 1.05,
-                        transition: { duration: 0.3, ease: "easeOut" }
-                      }}
-                      whileTap={{ 
-                        scale: 0.98,
-                        transition: { duration: 0.1 }
-                      }}
-                      onClick={() => handleNavigation(item)}
-                      className="relative text-gray-700 hover:text-orange-600 font-semibold text-lg transition-colors duration-300"
-                    >
-                      <span className="relative z-10">{item}</span>
-                      
-                      {/* Smooth background highlight */}
-                      <motion.div
-                        className="absolute inset-0 bg-orange-50 rounded-lg -mx-2 -my-1"
-                        initial={{ scale: 0, opacity: 0 }}
-                        whileHover={{ 
-                          scale: 1.1, 
-                          opacity: 1,
-                          transition: { duration: 0.3, ease: "easeOut" }
-                        }}
-                        exit={{ 
-                          scale: 0, 
-                          opacity: 0,
-                          transition: { duration: 0.2 }
-                        }}
-                      />
-                      
-                      {/* Enhanced underline with gradient */}
-                      <motion.div
-                        className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"
-                        initial={{ width: 0 }}
-                        whileHover={{ width: '100%' }}
-                        transition={{ duration: 0.4, ease: "easeOut" }}
-                      />
-                      
-                      {/* Animated dots */}
-                      <motion.div
-                        className="absolute -right-2 top-1/2 w-1 h-1 bg-orange-500 rounded-full opacity-0"
-                        initial={{ scale: 0 }}
-                        whileHover={{ 
-                          opacity: 1,
-                          scale: 1.2,
-                          transition: { duration: 0.3, delay: 0.1 }
-                        }}
-                      />
-                    </motion.button>
-                  ))}
-                </div>
-
-                {/* Center Section - Enhanced Search Bar */}
-                <div className="hidden md:flex flex-1 justify-center px-6">
-                  <form onSubmit={handleSearchSubmit} className="relative w-full max-w-xs">
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder={placeholderText}
-                      className="w-full pl-12 pr-12 py-3 border-2 border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300 text-base bg-white/80 backdrop-blur-sm"
-                    />
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <motion.div
-                        whileHover={{ scale: 1.2, rotate: 180 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <Search className="h-5 w-5 text-orange-500" />
-                      </motion.div>
-                    </div>
+                {/* Right Section - Mobile-First Icons */}
+                <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-3 flex-shrink-0">
+                  {/* Chef's Secrets Button - Always visible on mobile */}
+                  <motion.button
+                    whileHover={{ 
+                      scale: 1.05
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setIsChefSecretsOpen(true)}
+                    className="relative p-2 sm:p-2.5 lg:p-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-full transition-all duration-300 group min-w-[44px] min-h-[44px] flex items-center justify-center"
+                    title="Chef's Secrets"
+                  >
+                    <ChefHat className="w-5 h-5 sm:w-5 sm:h-5 lg:w-6 lg:h-6 group-hover:animate-pulse" />
                     
-                    {/* Animated search indicator */}
+                    {/* Secret indicator */}
                     <motion.div
-                      className="absolute inset-y-0 right-0 pr-4 flex items-center"
-                      animate={{
-                        opacity: [0.5, 1, 0.5],
-                        scale: [1, 1.1, 1]
+                      animate={{ 
+                        scale: [1, 1.2, 1],
+                        opacity: [0.6, 1, 0.6]
                       }}
                       transition={{
                         duration: 2,
                         repeat: Infinity,
                         ease: "easeInOut"
                       }}
-                    >
-                      <div className="w-2 h-2 bg-orange-500 rounded-full" />
-                    </motion.div>
-                  </form>
-                </div>
-
-                {/* Right Section - Enhanced Cart and Auth */}
-                <div className="flex items-center space-x-4">
-                  {/* Search Icon for mobile */}
-                  <motion.button
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="p-2 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-full transition-all duration-200 md:hidden"
-                    title="Menu"
-                  >
-                    <Search className="w-5 h-5" />
+                      className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full border border-white shadow-sm"
+                    />
                   </motion.button>
 
-                  {/* Enhanced Cart Icon */}
+                  {/* Cart Icon - Always visible */}
                   <motion.button
                     whileHover={{ 
-                      scale: 1.2,
-                      rotate: [0, 5, -5, 0],
-                      transition: { 
-                        duration: 0.6,
-                        repeat: Infinity,
-                        repeatType: "reverse"
-                      }
+                      scale: 1.05
                     }}
-                    whileTap={{ scale: 0.9 }}
+                    whileTap={{ scale: 0.95 }}
                     animate={{
-                      y: [0, -2, 0],
-                      boxShadow: [
-                        "0 0 0px rgba(249, 115, 22, 0)",
-                        "0 0 20px rgba(249, 115, 22, 0.3)",
-                        "0 0 0px rgba(249, 115, 22, 0)"
-                      ]
+                      y: [0, -1, 0]
                     }}
                     transition={{
-                      duration: 3,
+                      duration: 2.5,
                       repeat: Infinity,
                       repeatType: "loop",
                       ease: "easeInOut"
                     }}
                     onClick={() => router.push('/cart')}
-                    className="relative p-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-full transition-all duration-300 group"
+                    className="relative p-2 sm:p-2.5 lg:p-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-full transition-all duration-300 group min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
-                    <ShoppingCart className="w-6 h-6 group-hover:animate-bounce" />
+                    <ShoppingCart className="w-5 h-5 sm:w-5 sm:h-5 lg:w-6 lg:h-6 group-hover:animate-bounce" />
                     
                     {cartCount > 0 && (
                       <motion.span
-                        initial={{ scale: 0, rotate: -180 }}
+                        initial={{ scale: 0 }}
                         animate={{ 
-                          scale: [1, 1.2, 1],
-                          rotate: [0, 10, -10, 0],
-                          y: [0, -2, 0]
+                          scale: [1, 1.1, 1],
+                          y: [0, -1, 0]
                         }}
                         transition={{
-                          scale: { duration: 0.6, delay: 0.2 },
-                          rotate: { duration: 1, delay: 0.4, repeat: Infinity },
-                          y: { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
+                          scale: { duration: 0.4, delay: 0.1 },
+                          y: { duration: 1, repeat: Infinity, ease: "easeInOut" }
                         }}
-                        className="absolute -top-1 -right-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs rounded-full w-7 h-7 flex items-center justify-center font-medium shadow-lg border-2 border-white"
+                        className="absolute -top-1 -right-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] sm:min-w-[20px] sm:h-[20px] flex items-center justify-center font-medium shadow-lg border border-white text-[10px] sm:text-xs"
                       >
-                        {cartCount}
+                        {cartCount > 99 ? '99+' : cartCount}
                       </motion.span>
                     )}
                   </motion.button>
 
-                  {/* Enhanced Auth Section */}
+                  {/* User Icon - Always visible */}
                   {user ? (
                     <div className="relative group">
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-full transition-all duration-200"
+                        className="flex items-center justify-center p-2 sm:p-2.5 lg:p-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-full transition-all duration-200 min-w-[44px] min-h-[44px]"
                       >
                         <motion.div
-                          whileHover={{ rotate: 360, scale: 1.1 }}
-                          transition={{ duration: 0.5 }}
+                          whileHover={{ rotate: 15, scale: 1.1 }}
+                          transition={{ duration: 0.3 }}
                           className="relative"
                         >
-                          <User className="w-4 h-4" />
-                          <motion.div
-                            className="absolute -inset-2 bg-orange-400 rounded-full opacity-0"
-                            whileHover={{ opacity: 0.2, scale: 1.5 }}
-                            transition={{ duration: 0.3 }}
-                          />
+                          <User className="w-5 h-5 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
                         </motion.div>
-                        <span className="text-xs sm:text-sm md:text-base font-medium hidden sm:block">
-                          {user.email?.split('@')[0]}
-                        </span>
                       </motion.button>
                       
-                      {/* Enhanced Dropdown Menu */}
+                      {/* Simple Dropdown Menu for mobile */}
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                        initial={{ opacity: 0, scale: 0.95, y: -5 }}
                         whileHover={{ opacity: 1, scale: 1, y: 0 }}
-                        className="absolute right-0 mt-2 w-48 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200/50 py-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 overflow-hidden"
+                        className="absolute right-0 mt-2 w-40 sm:w-44 bg-white/95 backdrop-blur-md rounded-xl shadow-xl border border-gray-200/50 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden z-50"
                       >
-                        <motion.div
-                          className="absolute inset-0 bg-gradient-to-br from-orange-100/50 to-amber-100/50"
-                          whileHover={{ opacity: 1 }}
-                        />
+                        <div className="px-3 py-2 border-b border-gray-100">
+                          <p className="text-xs sm:text-sm text-gray-600 truncate">{user.email?.split('@')[0]}</p>
+                        </div>
                         <button
                           onClick={handleLogout}
-                          className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-orange-500 hover:to-amber-500 hover:text-white transition-all duration-300 flex items-center space-x-3 relative z-10"
+                          className="w-full text-left px-3 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 flex items-center space-x-2 text-sm"
                         >
                           <LogOut className="w-4 h-4" />
                           <span>Logout</span>
@@ -472,36 +371,31 @@ export default function Header() {
                     </div>
                   ) : (
                     <motion.button
-                      whileHover={{ scale: 1.15, rotate: 5 }}
+                      whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setIsLoginModalOpen(true)}
-                      className="p-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-full transition-all duration-200 relative"
+                      className="p-2 sm:p-2.5 lg:p-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-full transition-all duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
                       aria-label="Login"
                     >
-                      <motion.div
-                        whileHover={{ rotate: 360, scale: 1.1 }}
-                        transition={{ duration: 0.5 }}
-                      >
-                        <User className="w-5 h-5" />
-                      </motion.div>
+                      <User className="w-5 h-5 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
                     </motion.button>
                   )}
 
-                  {/* Enhanced Mobile Menu Button */}
+                  {/* Mobile Menu Button */}
                   <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="xl:hidden p-2 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-full transition-all duration-200 relative"
+                    className="p-2 sm:p-2.5 lg:p-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-full transition-all duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     <motion.div
                       animate={{ rotate: isMobileMenuOpen ? 180 : 0 }}
                       transition={{ duration: 0.3 }}
                     >
                       {isMobileMenuOpen ? (
-                        <X className="w-5 h-5" />
+                        <X className="w-5 h-5 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
                       ) : (
-                        <Menu className="w-5 h-5" />
+                        <Menu className="w-5 h-5 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
                       )}
                     </motion.div>
                   </motion.button>
@@ -616,6 +510,12 @@ export default function Header() {
       <LoginModal 
         isOpen={isLoginModalOpen} 
         onClose={() => setIsLoginModalOpen(false)} 
+      />
+      
+      {/* Chef's Secrets Modal */}
+      <ChefSecrets
+        isOpen={isChefSecretsOpen}
+        onClose={() => setIsChefSecretsOpen(false)}
       />
       
       {/* Scroll Progress Indicator */}
