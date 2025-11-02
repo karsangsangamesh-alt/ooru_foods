@@ -227,11 +227,54 @@ export default function ProductShowcase() {
           transition={{ delay: 0.2, duration: 0.6 }}
         >
           {products.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-              {products.map((product, index) => (
-                <ProductCard key={product.id} product={product} index={index} />
-              ))}
-            </div>
+            <>
+              {/* Mobile-First Horizontal Scroll Container */}
+              <div className="block lg:hidden">
+                {/* Mobile Scroll Hint */}
+                <div className="text-center mb-4">
+                  <p className="text-xs text-gray-500 flex items-center justify-center space-x-2">
+                    <span>← Scroll to explore more chutneys →</span>
+                  </p>
+                </div>
+                
+                {/* Horizontal Scroll Products */}
+                <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 px-2 snap-x snap-mandatory">
+                  {products.map((product, index) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, x: 50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ 
+                        delay: index * 0.1, 
+                        duration: 0.5,
+                        type: 'spring',
+                        stiffness: 100
+                      }}
+                      className="flex-none w-[280px] snap-start"
+                    >
+                      <ProductCard product={product} index={index} />
+                    </motion.div>
+                  ))}
+                </div>
+                
+                {/* Mobile Scroll Indicators */}
+                <div className="flex justify-center mt-6 space-x-2">
+                  {products.map((_, index) => (
+                    <div
+                      key={index}
+                      className="w-2 h-2 rounded-full bg-orange-200"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Desktop Grid Layout */}
+              <div className="hidden lg:grid grid-cols-3 gap-6 lg:gap-8">
+                {products.map((product, index) => (
+                  <ProductCard key={product.id} product={product} index={index} />
+                ))}
+              </div>
+            </>
           ) : (
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
