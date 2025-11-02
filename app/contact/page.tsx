@@ -240,32 +240,32 @@ export default function ContactPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 pt-20">
-        {/* Enhanced Hero Section */}
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 pt-16 sm:pt-20">
+        {/* Mobile-First Hero Section */}
         <motion.div
           initial="hidden"
           animate="visible"
           variants={containerVariants}
-          className="text-center py-16 px-4"
+          className="text-center py-8 sm:py-12 md:py-16 px-4"
         >
           <motion.div
             variants={itemVariants}
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
-            className="w-32 h-32 bg-gradient-to-r from-orange-500 via-amber-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-8 relative overflow-hidden"
+            className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 bg-gradient-to-r from-orange-500 via-amber-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 relative overflow-hidden"
           >
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"
             />
-            <MessageCircleIcon className="text-white text-5xl relative z-10" />
+            <MessageCircleIcon className="text-white text-3xl sm:text-4xl md:text-5xl relative z-10" />
           </motion.div>
           
           <motion.h1
             variants={itemVariants}
-            className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-orange-600 via-amber-600 to-red-600 bg-clip-text text-transparent mb-6 leading-tight"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl font-bold bg-gradient-to-r from-orange-600 via-amber-600 to-red-600 bg-clip-text text-transparent mb-4 sm:mb-6 leading-tight"
           >
             Let's Start a
             <motion.span
@@ -285,21 +285,21 @@ export default function ContactPage() {
           
           <motion.p
             variants={itemVariants}
-            className="text-xl text-gray-600 max-w-3xl mx-auto mb-12 leading-relaxed"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto mb-8 sm:mb-12 leading-relaxed px-4"
           >
             We're here to help! Reach out to us through any of these convenient ways and we'll get back to you faster than you can say "chutney pudi"! 🚀
           </motion.p>
         </motion.div>
 
-        {/* Enhanced Quick Contact Options */}
+        {/* Mobile-First Quick Contact Options */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="container mx-auto px-4 mb-20"
+          className="container mx-auto px-4 mb-12 sm:mb-16 md:mb-20"
         >
           <motion.div 
-            className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto"
             variants={containerVariants}
           >
             {[
@@ -348,18 +348,19 @@ export default function ContactPage() {
                 key={index}
                 variants={itemVariants}
                 whileHover={{ 
-                  scale: 1.05, 
-                  y: -10,
-                  boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+                  scale: 1.02, 
+                  y: -5,
+                  boxShadow: "0 20px 40px -12px rgba(0, 0, 0, 0.25)"
                 }}
-                className={`bg-gradient-to-br ${contact.gradient} border-2 ${contact.borderColor} rounded-3xl p-8 cursor-pointer group relative overflow-hidden transition-all duration-500`}
+                whileTap={{ scale: 0.98 }}
+                className={`bg-gradient-to-br ${contact.gradient} border-2 ${contact.borderColor} rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 cursor-pointer group relative overflow-hidden transition-all duration-500 touch-manipulation`}
               >
                 <motion.div
                   whileHover={{ rotate: 360 }}
                   transition={{ duration: 0.6 }}
-                  className={`w-20 h-20 bg-gradient-to-r ${contact.color} rounded-2xl flex items-center justify-center mb-6 relative z-10`}
+                  className={`w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-gradient-to-r ${contact.color} rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 relative z-10`}
                 >
-                  <contact.icon className="text-white text-3xl" />
+                  <contact.icon className="text-white text-xl sm:text-2xl lg:text-3xl" />
                 </motion.div>
                 
                 <motion.div
@@ -367,9 +368,9 @@ export default function ContactPage() {
                   animate={{ opacity: 1 }}
                   className="relative z-10"
                 >
-                  <h3 className="font-bold text-xl text-gray-800 mb-3">{contact.title}</h3>
-                  <p className="text-gray-600 text-sm mb-2">{contact.subtitle}</p>
-                  <p className="text-gray-500 text-xs mb-6">{contact.description}</p>
+                  <h3 className="font-bold text-base sm:text-lg lg:text-xl text-gray-800 mb-2 sm:mb-3">{contact.title}</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">{contact.subtitle}</p>
+                  <p className="text-gray-500 text-xs mb-4 sm:mb-6">{contact.description}</p>
                   
                   <motion.div
                     whileHover={{ scale: 1.02 }}
@@ -378,7 +379,7 @@ export default function ContactPage() {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className={`w-full group-hover:bg-gradient-to-r group-hover:${contact.color} group-hover:text-white transition-all duration-300 relative z-10`}
+                      className={`w-full group-hover:bg-gradient-to-r group-hover:${contact.color} group-hover:text-white transition-all duration-300 relative z-10 touch-manipulation min-h-[44px]`}
                     >
                       {contact.action}
                       <ArrowRight className="w-4 h-4 ml-2" />
@@ -398,16 +399,31 @@ export default function ContactPage() {
           </motion.div>
         </motion.div>
 
-        {/* Enhanced Multi-Step Contact Form */}
-        <div className="container mx-auto px-4 py-8">
+        {/* Mobile-First Multi-Step Contact Form */}
+        <div className="container mx-auto px-4 py-4 sm:py-8">
           <div className="max-w-5xl mx-auto">
-            {/* Enhanced Progress Bar */}
+            {/* Mobile-First Progress Bar */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-16"
+              className="mb-8 sm:mb-12 md:mb-16"
             >
-              <div className="flex justify-between items-center mb-8">
+              {/* Mobile Step Navigation */}
+              <div className="flex sm:hidden justify-center items-center mb-6">
+                <div className="flex items-center space-x-2">
+                  {steps.map((_, index) => (
+                    <motion.div
+                      key={index}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                        index <= currentStep ? 'bg-orange-500' : 'bg-gray-300'
+                      }`}
+                      whileTap={{ scale: 1.2 }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="hidden sm:flex justify-between items-center mb-8">
                 {steps.map((step, index) => {
                   const Icon = step.icon;
                   return (
@@ -419,16 +435,16 @@ export default function ContactPage() {
                       <motion.div
                         whileHover={{ rotate: 360 }}
                         transition={{ duration: 0.6 }}
-                        className={`w-16 h-16 rounded-2xl flex items-center justify-center font-bold transition-all duration-500 relative overflow-hidden ${
+                        className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center font-bold transition-all duration-500 relative overflow-hidden ${
                           index <= currentStep
                             ? `bg-gradient-to-r ${step.color} text-white shadow-lg`
                             : 'bg-gray-200 text-gray-400'
                         }`}
                       >
                         {index < currentStep ? (
-                          <Check className="text-white text-2xl" />
+                          <Check className="text-white text-xl sm:text-2xl" />
                         ) : (
-                          <Icon className="text-2xl" />
+                          <Icon className="text-xl sm:text-2xl" />
                         )}
                         
                         {/* Animated background for active step */}
@@ -445,7 +461,7 @@ export default function ContactPage() {
                         )}
                       </motion.div>
                       <motion.p 
-                        className={`text-sm mt-3 text-center max-w-24 font-medium ${
+                        className={`text-xs sm:text-sm mt-2 sm:mt-3 text-center max-w-20 sm:max-w-24 font-medium ${
                           index === currentStep ? 'text-orange-600' : 'text-gray-500'
                         }`}
                         animate={{ 
@@ -459,11 +475,11 @@ export default function ContactPage() {
                 })}
               </div>
               
-              {/* Enhanced Progress Bar */}
+              {/* Mobile-First Progress Bar */}
               <div className="relative">
-                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3 overflow-hidden">
                   <motion.div
-                    className="bg-gradient-to-r from-orange-500 via-amber-500 to-red-500 h-3 rounded-full relative overflow-hidden"
+                    className="bg-gradient-to-r from-orange-500 via-amber-500 to-red-500 h-2 sm:h-3 rounded-full relative overflow-hidden"
                     initial={{ width: 0 }}
                     animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
@@ -480,24 +496,26 @@ export default function ContactPage() {
                   </motion.div>
                 </div>
                 
-                {/* Step indicators */}
-                {steps.map((_, index) => (
-                  <motion.div
-                    key={index}
-                    className={`absolute top-0 w-3 h-3 rounded-full transform -translate-y-0 transition-all duration-500 ${
-                      index <= currentStep ? 'bg-white border-2 border-orange-500' : 'bg-gray-400'
-                    }`}
-                    style={{ left: `${(index / (steps.length - 1)) * 100}%` }}
-                    animate={{ 
-                      scale: index === currentStep ? 1.2 : 1,
-                      boxShadow: index === currentStep ? "0 0 20px rgba(234, 88, 12, 0.5)" : "0 0 0px rgba(0, 0, 0, 0)"
-                    }}
-                  />
-                ))}
+                {/* Desktop Step indicators */}
+                <div className="hidden sm:block">
+                  {steps.map((_, index) => (
+                    <motion.div
+                      key={index}
+                      className={`absolute top-0 w-3 h-3 rounded-full transform -translate-y-0 transition-all duration-500 ${
+                        index <= currentStep ? 'bg-white border-2 border-orange-500' : 'bg-gray-400'
+                      }`}
+                      style={{ left: `${(index / (steps.length - 1)) * 100}%` }}
+                      animate={{ 
+                        scale: index === currentStep ? 1.2 : 1,
+                        boxShadow: index === currentStep ? "0 0 20px rgba(234, 88, 12, 0.5)" : "0 0 0px rgba(0, 0, 0, 0)"
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
             </motion.div>
 
-            {/* Enhanced Form Content */}
+            {/* Mobile-First Form Content */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}
@@ -505,7 +523,7 @@ export default function ContactPage() {
                 animate={{ opacity: 1, x: 0, rotateY: 0 }}
                 exit={{ opacity: 0, x: -50, rotateY: 15 }}
                 transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-                className="bg-white rounded-3xl shadow-2xl p-10 md:p-16 border border-orange-100 relative overflow-hidden"
+                className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-8 md:p-12 lg:p-16 border border-orange-100 relative overflow-hidden"
               >
                 {/* Animated background pattern */}
                 <motion.div
@@ -523,25 +541,25 @@ export default function ContactPage() {
                 
                 {/* Step Header */}
                 <motion.div 
-                  className="text-center mb-12 relative z-10"
+                  className="text-center mb-8 sm:mb-12 relative z-10"
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
                 >
                   <motion.div
-                    className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r ${steps[currentStep].color} mb-4`}
+                    className={`inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-r ${steps[currentStep].color} mb-3 sm:mb-4`}
                     whileHover={{ scale: 1.1, rotate: 5 }}
                   >
-                    {React.createElement(steps[currentStep].icon, { className: "text-white text-2xl" })}
+                    {React.createElement(steps[currentStep].icon, { className: "text-white text-xl sm:text-2xl" })}
                   </motion.div>
                   
-                  <h2 className="text-4xl font-bold text-gray-800 mb-4">{steps[currentStep].title}</h2>
-                  <p className="text-xl text-gray-600">{steps[currentStep].subtitle}</p>
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2 sm:mb-4">{steps[currentStep].title}</h2>
+                  <p className="text-base sm:text-lg md:text-xl text-gray-600">{steps[currentStep].subtitle}</p>
                 </motion.div>
 
-                {/* Enhanced Step Content */}
+                {/* Mobile-First Step Content */}
                 <motion.div 
-                  className="space-y-8 relative z-10"
+                  className="space-y-6 sm:space-y-8 relative z-10"
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
@@ -550,10 +568,10 @@ export default function ContactPage() {
                     <>
                       <motion.div 
                         variants={itemVariants}
-                        className="grid md:grid-cols-2 gap-8"
+                        className="space-y-4 sm:space-y-6"
                       >
-                        <motion.div whileHover={{ scale: 1.02 }}>
-                          <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                        <motion.div whileHover={{ scale: 1.01 }}>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3 flex items-center">
                             <User className="w-4 h-4 mr-2 text-orange-500" />
                             Full Name *
                           </label>
@@ -562,11 +580,11 @@ export default function ContactPage() {
                             value={formData.personalInfo.name}
                             onChange={(e) => updateFormData('personalInfo', 'name', e.target.value)}
                             placeholder="Enter your full name"
-                            className="w-full h-12 text-lg transition-all duration-300 focus:ring-2 focus:ring-orange-500 border-2 border-gray-200 focus:border-orange-500"
+                            className="w-full h-12 text-base transition-all duration-300 focus:ring-2 focus:ring-orange-500 border-2 border-gray-200 focus:border-orange-500 touch-manipulation"
                           />
                         </motion.div>
-                        <motion.div whileHover={{ scale: 1.02 }}>
-                          <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                        <motion.div whileHover={{ scale: 1.01 }}>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3 flex items-center">
                             <Mail className="w-4 h-4 mr-2 text-orange-500" />
                             Email Address *
                           </label>
@@ -575,22 +593,22 @@ export default function ContactPage() {
                             value={formData.personalInfo.email}
                             onChange={(e) => updateFormData('personalInfo', 'email', e.target.value)}
                             placeholder="your@email.com"
-                            className="w-full h-12 text-lg transition-all duration-300 focus:ring-2 focus:ring-orange-500 border-2 border-gray-200 focus:border-orange-500"
+                            className="w-full h-12 text-base transition-all duration-300 focus:ring-2 focus:ring-orange-500 border-2 border-gray-200 focus:border-orange-500 touch-manipulation"
                           />
                         </motion.div>
-                      </motion.div>
-                      <motion.div variants={itemVariants} whileHover={{ scale: 1.01 }}>
-                        <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                          <Phone className="w-4 h-4 mr-2 text-orange-500" />
-                          Phone Number
-                        </label>
-                        <Input
-                          type="tel"
-                          value={formData.personalInfo.phone}
-                          onChange={(e) => updateFormData('personalInfo', 'phone', e.target.value)}
-                          placeholder="+91 98765 43210"
-                          className="w-full h-12 text-lg transition-all duration-300 focus:ring-2 focus:ring-orange-500 border-2 border-gray-200 focus:border-orange-500"
-                        />
+                        <motion.div whileHover={{ scale: 1.01 }}>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3 flex items-center">
+                            <Phone className="w-4 h-4 mr-2 text-orange-500" />
+                            Phone Number
+                          </label>
+                          <Input
+                            type="tel"
+                            value={formData.personalInfo.phone}
+                            onChange={(e) => updateFormData('personalInfo', 'phone', e.target.value)}
+                            placeholder="+91 98765 43210"
+                            className="w-full h-12 text-base transition-all duration-300 focus:ring-2 focus:ring-orange-500 border-2 border-gray-200 focus:border-orange-500 touch-manipulation"
+                          />
+                        </motion.div>
                       </motion.div>
                     </>
                   )}
@@ -598,36 +616,36 @@ export default function ContactPage() {
                   {currentStep === 1 && (
                     <>
                       <motion.div variants={itemVariants}>
-                        <label className="block text-sm font-semibold text-gray-700 mb-6 flex items-center">
+                        <label className="block text-sm font-semibold text-gray-700 mb-4 sm:mb-6 flex items-center">
                           <MessageCircle className="w-4 h-4 mr-2 text-orange-500" />
                           Category *
                         </label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
                           {categories.map((category) => {
                             const Icon = category.icon;
                             return (
                               <motion.button
                                 key={category.value}
-                                whileHover={{ scale: 1.05, y: -5 }}
-                                whileTap={{ scale: 0.95 }}
+                                whileHover={{ scale: 1.02, y: -2 }}
+                                whileTap={{ scale: 0.98 }}
                                 onClick={() => updateFormData('inquiryDetails', 'category', category.value)}
-                                className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left ${
+                                className={`p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 transition-all duration-300 text-left touch-manipulation ${
                                   formData.inquiryDetails.category === category.value
                                     ? 'border-orange-500 bg-orange-50 shadow-lg'
                                     : 'border-gray-200 hover:border-orange-300 hover:shadow-md'
                                 }`}
                               >
-                                <div className="flex items-center mb-3">
-                                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mr-4 ${
+                                <div className="flex items-center mb-2 sm:mb-3">
+                                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center mr-3 sm:mr-4 ${
                                     formData.inquiryDetails.category === category.value
                                       ? 'bg-orange-500 text-white'
                                       : 'bg-gray-100 text-gray-600'
                                   }`}>
-                                    <Icon className="text-xl" />
+                                    <Icon className="text-lg sm:text-xl" />
                                   </div>
-                                  <div className="font-semibold text-gray-800">{category.label}</div>
+                                  <div className="font-semibold text-sm sm:text-base text-gray-800">{category.label}</div>
                                 </div>
-                                <p className="text-sm text-gray-600">{category.description}</p>
+                                <p className="text-xs sm:text-sm text-gray-600">{category.description}</p>
                               </motion.button>
                             );
                           })}
@@ -635,7 +653,7 @@ export default function ContactPage() {
                       </motion.div>
                       
                       <motion.div variants={itemVariants} whileHover={{ scale: 1.01 }}>
-                        <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3 flex items-center">
                           <FileText className="w-4 h-4 mr-2 text-orange-500" />
                           Subject *
                         </label>
@@ -644,16 +662,16 @@ export default function ContactPage() {
                           value={formData.inquiryDetails.subject}
                           onChange={(e) => updateFormData('inquiryDetails', 'subject', e.target.value)}
                           placeholder="Brief description of your inquiry"
-                          className="w-full h-12 text-lg transition-all duration-300 focus:ring-2 focus:ring-orange-500 border-2 border-gray-200 focus:border-orange-500"
+                          className="w-full h-12 text-base transition-all duration-300 focus:ring-2 focus:ring-orange-500 border-2 border-gray-200 focus:border-orange-500 touch-manipulation"
                         />
                       </motion.div>
 
                       <motion.div variants={itemVariants}>
-                        <label className="block text-sm font-semibold text-gray-700 mb-6 flex items-center">
+                        <label className="block text-sm font-semibold text-gray-700 mb-4 sm:mb-6 flex items-center">
                           <Zap className="w-4 h-4 mr-2 text-orange-500" />
                           Priority
                         </label>
-                        <div className="grid grid-cols-3 gap-6">
+                        <div className="grid grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
                           {priorities.map((priority) => {
                             const Icon = priority.icon;
                             return (
@@ -662,16 +680,16 @@ export default function ContactPage() {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => updateFormData('inquiryDetails', 'priority', priority.value)}
-                                className={`p-6 rounded-2xl border-2 transition-all duration-300 ${
+                                className={`p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 transition-all duration-300 touch-manipulation ${
                                   formData.inquiryDetails.priority === priority.value
                                     ? 'border-orange-500 bg-orange-50 shadow-lg'
                                     : 'border-gray-200 hover:border-orange-300 hover:shadow-md'
                                 }`}
                               >
-                                <div className="flex flex-col items-center space-y-3">
-                                  <Icon className={`text-2xl ${priority.color}`} />
-                                  <span className={`font-bold ${priority.color}`}>{priority.label}</span>
-                                  <span className="text-xs text-gray-500 text-center">{priority.description}</span>
+                                <div className="flex flex-col items-center space-y-2 sm:space-y-3">
+                                  <Icon className={`text-xl sm:text-2xl ${priority.color}`} />
+                                  <span className={`font-bold text-sm sm:text-base ${priority.color}`}>{priority.label}</span>
+                                  <span className="text-xs text-gray-500 text-center hidden sm:block">{priority.description}</span>
                                 </div>
                               </motion.button>
                             );
@@ -684,7 +702,7 @@ export default function ContactPage() {
                   {currentStep === 2 && (
                     <>
                       <motion.div variants={itemVariants} whileHover={{ scale: 1.01 }}>
-                        <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3 flex items-center">
                           <FileText className="w-4 h-4 mr-2 text-orange-500" />
                           Your Message *
                         </label>
@@ -692,7 +710,7 @@ export default function ContactPage() {
                           value={formData.messageDetails.message}
                           onChange={(e) => updateFormData('messageDetails', 'message', e.target.value)}
                           rows={6}
-                          className="w-full px-4 py-4 border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none transition-all duration-300 text-lg"
+                          className="w-full px-4 py-4 border-2 border-gray-300 rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none transition-all duration-300 text-base touch-manipulation"
                           placeholder="Please provide as much detail as possible so we can assist you better..."
                         />
                         <div className="flex justify-between items-center mt-2">
@@ -711,9 +729,9 @@ export default function ContactPage() {
                         <motion.div 
                           variants={itemVariants} 
                           whileHover={{ scale: 1.01 }}
-                          className="bg-blue-50 border border-blue-200 rounded-2xl p-6"
+                          className="bg-blue-50 border border-blue-200 rounded-xl sm:rounded-2xl p-4 sm:p-6"
                         >
-                          <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                          <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3 flex items-center">
                             <Package className="w-4 h-4 mr-2 text-blue-500" />
                             Order Number (if applicable)
                           </label>
@@ -722,18 +740,18 @@ export default function ContactPage() {
                             value={formData.messageDetails.orderNumber}
                             onChange={(e) => updateFormData('messageDetails', 'orderNumber', e.target.value)}
                             placeholder="ORD-123456"
-                            className="w-full h-12 text-lg transition-all duration-300 focus:ring-2 focus:ring-blue-500 border-2 border-gray-200 focus:border-blue-500"
+                            className="w-full h-12 text-base transition-all duration-300 focus:ring-2 focus:ring-blue-500 border-2 border-gray-200 focus:border-blue-500 touch-manipulation"
                           />
                         </motion.div>
                       )}
 
                       <motion.div variants={itemVariants}>
-                        <label className="block text-sm font-semibold text-gray-700 mb-6 flex items-center">
+                        <label className="block text-sm font-semibold text-gray-700 mb-4 sm:mb-6 flex items-center">
                           <Paperclip className="w-4 h-4 mr-2 text-orange-500" />
                           Attachments (optional)
                         </label>
                         <motion.div
-                          className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300 ${
+                          className={`border-2 border-dashed rounded-xl sm:rounded-2xl p-6 sm:p-12 text-center transition-all duration-300 touch-manipulation ${
                             dragActive
                               ? 'border-orange-500 bg-orange-50'
                               : 'border-gray-300 hover:border-orange-300'
@@ -742,8 +760,8 @@ export default function ContactPage() {
                           onDragLeave={handleDrag}
                           onDragOver={handleDrag}
                           onDrop={handleDrop}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
+                          whileHover={{ scale: 1.01 }}
+                          whileTap={{ scale: 0.99 }}
                         >
                           <input
                             ref={fileInputRef}
@@ -766,20 +784,20 @@ export default function ContactPage() {
                           <motion.div
                             animate={{ 
                               y: dragActive ? -10 : 0,
-                              scale: dragActive ? 1.1 : 1
+                              scale: dragActive ? 1.05 : 1
                             }}
                             transition={{ duration: 0.3 }}
                           >
                             <motion.div
                               animate={{ rotate: 360 }}
                               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                              className="w-20 h-20 bg-gradient-to-r from-orange-100 to-amber-100 rounded-full flex items-center justify-center mx-auto mb-6"
+                              className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-orange-100 to-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6"
                             >
-                              <Upload className="text-2xl text-orange-500" />
+                              <Upload className="text-xl sm:text-2xl text-orange-500" />
                             </motion.div>
-                            <div className="space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
                               <div>
-                                <p className="text-gray-700 font-medium text-lg">
+                                <p className="text-gray-700 font-medium text-base sm:text-lg">
                                   {dragActive ? 'Drop files here!' : 'Drag & drop files here, or'}
                                 </p>
                                 <motion.button
@@ -787,12 +805,12 @@ export default function ContactPage() {
                                   onClick={() => fileInputRef.current?.click()}
                                   whileHover={{ scale: 1.05 }}
                                   whileTap={{ scale: 0.95 }}
-                                  className="text-orange-600 hover:text-orange-700 font-bold text-lg underline mt-2"
+                                  className="text-orange-600 hover:text-orange-700 font-bold text-base sm:text-lg underline mt-2 touch-manipulation"
                                 >
                                   browse files
                                 </motion.button>
                               </div>
-                              <p className="text-sm text-gray-500">Supports: JPG, PNG, PDF, DOC (Max 10MB)</p>
+                              <p className="text-xs sm:text-sm text-gray-500">Supports: JPG, PNG, PDF, DOC (Max 10MB)</p>
                             </div>
                           </motion.div>
                         </motion.div>
@@ -800,7 +818,7 @@ export default function ContactPage() {
                         {/* Enhanced Attachment List */}
                         {formData.messageDetails.attachments.length > 0 && (
                           <motion.div 
-                            className="mt-6 space-y-3"
+                            className="mt-4 sm:mt-6 space-y-3"
                             variants={containerVariants}
                             initial="hidden"
                             animate="visible"
@@ -809,25 +827,25 @@ export default function ContactPage() {
                               <motion.div
                                 key={index}
                                 variants={itemVariants}
-                                className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-200"
-                                whileHover={{ scale: 1.02 }}
+                                className="flex items-center justify-between bg-gray-50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-gray-200"
+                                whileHover={{ scale: 1.01 }}
                               >
-                                <div className="flex items-center gap-4">
-                                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                                    <FileText className="text-orange-600" />
+                                <div className="flex items-center gap-3 sm:gap-4">
+                                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                                    <FileText className="text-orange-600 text-sm sm:text-base" />
                                   </div>
                                   <div>
-                                    <p className="font-medium text-gray-800">{file.name}</p>
-                                    <p className="text-sm text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                                    <p className="font-medium text-sm sm:text-base text-gray-800 truncate max-w-[150px] sm:max-w-none">{file.name}</p>
+                                    <p className="text-xs sm:text-sm text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                                   </div>
                                 </div>
                                 <motion.button
                                   onClick={() => removeAttachment(index)}
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.9 }}
-                                  className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                                  className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors touch-manipulation"
                                 >
-                                  <X className="w-5 h-5" />
+                                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
                                 </motion.button>
                               </motion.div>
                             ))}
@@ -840,11 +858,11 @@ export default function ContactPage() {
                   {currentStep === 3 && (
                     <>
                       <motion.div variants={itemVariants}>
-                        <label className="block text-sm font-semibold text-gray-700 mb-6 flex items-center">
+                        <label className="block text-sm font-semibold text-gray-700 mb-4 sm:mb-6 flex items-center">
                           <Phone className="w-4 h-4 mr-2 text-orange-500" />
                           Preferred Contact Method
                         </label>
-                        <div className="grid grid-cols-3 gap-6">
+                        <div className="grid grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
                           {[
                             { value: 'email', label: 'Email', icon: Mail, description: 'Send me an email' },
                             { value: 'phone', label: 'Phone', icon: PhoneCall, description: 'Call me directly' },
@@ -854,25 +872,25 @@ export default function ContactPage() {
                             return (
                               <motion.button
                                 key={method.value}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
                                 onClick={() => updateFormData('preferences', 'contactMethod', method.value)}
-                                className={`p-6 rounded-2xl border-2 transition-all duration-300 ${
+                                className={`p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 transition-all duration-300 touch-manipulation ${
                                   formData.preferences.contactMethod === method.value
                                     ? 'border-orange-500 bg-orange-50 shadow-lg'
                                     : 'border-gray-200 hover:border-orange-300 hover:shadow-md'
                                 }`}
                               >
-                                <div className="text-center space-y-3">
-                                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto ${
+                                <div className="text-center space-y-2 sm:space-y-3">
+                                  <div className={`w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto ${
                                     formData.preferences.contactMethod === method.value
                                       ? 'bg-orange-500 text-white'
                                       : 'bg-gray-100 text-gray-600'
                                   }`}>
-                                    <Icon className="text-2xl" />
+                                    <Icon className="text-xl sm:text-2xl" />
                                   </div>
-                                  <div className="font-bold text-gray-800">{method.label}</div>
-                                  <div className="text-sm text-gray-600">{method.description}</div>
+                                  <div className="font-bold text-sm sm:text-base text-gray-800">{method.label}</div>
+                                  <div className="text-xs sm:text-sm text-gray-600 hidden sm:block">{method.description}</div>
                                 </div>
                               </motion.button>
                             );
@@ -882,31 +900,31 @@ export default function ContactPage() {
 
                       <motion.div 
                         variants={itemVariants}
-                        className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6"
+                        className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl sm:rounded-2xl p-4 sm:p-6"
                         whileHover={{ scale: 1.01 }}
                       >
-                        <div className="flex items-start space-x-4">
+                        <div className="flex items-start space-x-3 sm:space-x-4">
                           <motion.div
                             whileHover={{ rotate: 360 }}
                             transition={{ duration: 0.6 }}
-                            className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center"
+                            className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0"
                           >
-                            <Gift className="text-green-600 text-xl" />
+                            <Gift className="text-green-600 text-lg sm:text-xl" />
                           </motion.div>
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start space-x-3">
                               <input
                                 type="checkbox"
                                 id="newsletter"
                                 checked={formData.preferences.newsletter}
                                 onChange={(e) => updateFormData('preferences', 'newsletter', e.target.checked)}
-                                className="w-5 h-5 text-green-600 rounded focus:ring-green-500"
+                                className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 rounded focus:ring-green-500 mt-0.5 touch-manipulation"
                               />
-                              <label htmlFor="newsletter" className="text-sm font-semibold text-gray-700">
+                              <label htmlFor="newsletter" className="text-sm font-semibold text-gray-700 leading-tight">
                                 I'd love to receive updates about new products, special offers, and cooking tips! 🎁
                               </label>
                             </div>
-                            <p className="text-xs text-gray-600 mt-2 ml-8">
+                            <p className="text-xs text-gray-600 mt-2 ml-7 sm:ml-8">
                               Get exclusive recipes, discount codes, and be the first to know about new chutney varieties!
                             </p>
                           </div>
@@ -916,9 +934,9 @@ export default function ContactPage() {
                   )}
                 </motion.div>
 
-                {/* Enhanced Navigation Buttons */}
+                {/* Mobile-First Navigation Buttons */}
                 <motion.div 
-                  className="flex justify-between mt-12 relative z-10"
+                  className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0 mt-8 sm:mt-12 relative z-10"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
@@ -931,7 +949,7 @@ export default function ContactPage() {
                       onClick={prevStep}
                       disabled={currentStep === 0}
                       variant="outline"
-                      className="px-8 py-4 text-lg font-semibold transition-all duration-300"
+                      className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold transition-all duration-300 touch-manipulation min-h-[44px]"
                     >
                       ← Previous
                     </Button>
@@ -945,7 +963,7 @@ export default function ContactPage() {
                       <Button
                         onClick={handleSubmit}
                         disabled={!isStepValid(currentStep) || isSubmitting}
-                        className="px-10 py-4 text-lg font-semibold bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 relative overflow-hidden group"
+                        className="w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 relative overflow-hidden group touch-manipulation min-h-[44px]"
                       >
                         <motion.div
                           className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-30"
@@ -953,17 +971,17 @@ export default function ContactPage() {
                           transition={{ duration: 0.6 }}
                         />
                         {isSubmitting ? (
-                          <div className="flex items-center gap-3 relative z-10">
+                          <div className="flex items-center justify-center gap-3 relative z-10">
                             <motion.div
                               animate={{ rotate: 360 }}
                               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                              className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full"
                             />
                             <span>Sending...</span>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-3 relative z-10">
-                            <Send className="w-5 h-5" />
+                          <div className="flex items-center justify-center gap-3 relative z-10">
+                            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                             <span>Submit Message</span>
                           </div>
                         )}
@@ -977,16 +995,16 @@ export default function ContactPage() {
                       <Button
                         onClick={nextStep}
                         disabled={!isStepValid(currentStep)}
-                        className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 relative overflow-hidden group"
+                        className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 relative overflow-hidden group touch-manipulation min-h-[44px]"
                       >
                         <motion.div
                           className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-30"
                           animate={{ x: ["-100%", "100%"] }}
                           transition={{ duration: 0.6 }}
                         />
-                        <span className="relative z-10 flex items-center gap-2">
+                        <span className="relative z-10 flex items-center justify-center gap-2">
                           Next
-                          <ArrowRight className="w-5 h-5" />
+                          <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                         </span>
                       </Button>
                     </motion.div>
@@ -1002,13 +1020,13 @@ export default function ContactPage() {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm"
+                  className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm p-4"
                 >
                   <motion.div
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 50, opacity: 0 }}
-                    className="bg-white rounded-3xl p-12 max-w-lg mx-4 text-center relative overflow-hidden"
+                    className="bg-white rounded-2xl sm:rounded-3xl p-8 sm:p-12 max-w-lg w-full text-center relative overflow-hidden"
                   >
                     {/* Animated background */}
                     <motion.div
@@ -1028,18 +1046,18 @@ export default function ContactPage() {
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                      className="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-8 relative z-10"
+                      className="w-20 h-20 sm:w-24 sm:h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 relative z-10"
                     >
                       <motion.div
                         animate={{ rotate: [0, 360] }}
                         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                       >
-                        <CheckCircle2 className="text-white text-4xl" />
+                        <CheckCircle2 className="text-white text-3xl sm:text-4xl" />
                       </motion.div>
                     </motion.div>
                     
-                    <h3 className="text-3xl font-bold text-white mb-6 relative z-10">Message Sent Successfully! 🎉</h3>
-                    <p className="text-white text-lg mb-8 leading-relaxed relative z-10">
+                    <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 relative z-10">Message Sent Successfully! 🎉</h3>
+                    <p className="text-white text-base sm:text-lg mb-6 sm:mb-8 leading-relaxed relative z-10">
                       Thank you for contacting us! We've received your message and our team will get back to you within 24 hours.
                     </p>
                     
@@ -1049,9 +1067,9 @@ export default function ContactPage() {
                     >
                       <Button
                         onClick={() => setSubmitStatus('idle')}
-                        className="px-8 py-4 text-lg font-semibold bg-white text-green-600 hover:bg-gray-50 relative z-10"
+                        className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold bg-white text-green-600 hover:bg-gray-50 relative z-10 touch-manipulation min-h-[44px]"
                       >
-                        <Sparkles className="w-5 h-5 mr-2" />
+                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                         Close
                       </Button>
                     </motion.div>
@@ -1062,19 +1080,19 @@ export default function ContactPage() {
           </div>
         </div>
 
-        {/* Enhanced FAQ Section */}
+        {/* Mobile-First FAQ Section */}
         <motion.section
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
-          className="container mx-auto px-4 py-20"
+          className="container mx-auto px-4 py-12 sm:py-16 md:py-20"
         >
           <motion.div 
-            className="text-center mb-16"
+            className="text-center mb-8 sm:mb-12 md:mb-16"
             variants={itemVariants}
           >
             <motion.h2 
-              className="text-5xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-6"
+              className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6"
               animate={{ 
                 backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
               }}
@@ -1087,11 +1105,11 @@ export default function ContactPage() {
             >
               Frequently Asked Questions
             </motion.h2>
-            <p className="text-xl text-gray-600">Quick answers to common questions 💡</p>
+            <p className="text-base sm:text-lg md:text-xl text-gray-600">Quick answers to common questions 💡</p>
           </motion.div>
 
           <motion.div 
-            className="max-w-4xl mx-auto space-y-6"
+            className="max-w-4xl mx-auto space-y-4 sm:space-y-6"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -1143,7 +1161,7 @@ export default function ContactPage() {
   );
 }
 
-// Enhanced FAQ Component with Animation
+// Enhanced FAQ Component with Mobile-First Animation
 interface FAQItemProps {
   faq: {
     question: string;
@@ -1162,33 +1180,33 @@ const FAQItem = ({ faq, index }: FAQItemProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100"
+      className="bg-white rounded-2xl sm:rounded-3xl shadow-lg overflow-hidden border border-gray-100"
       whileHover={{ y: -2, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)" }}
     >
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors relative overflow-hidden"
-        whileHover={{ x: 4 }}
+        className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors relative overflow-hidden touch-manipulation min-h-[44px]"
+        whileHover={{ x: 2 }}
       >
         <motion.div 
-          className="flex items-center gap-6"
+          className="flex items-center gap-3 sm:gap-6 flex-1 min-w-0"
           layout
         >
           <motion.div
             whileHover={{ rotate: 360 }}
             transition={{ duration: 0.6 }}
-            className={`w-14 h-14 rounded-2xl bg-gradient-to-r ${faq.color || "from-orange-500 to-amber-500"} flex items-center justify-center`}
+            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-r ${faq.color || "from-orange-500 to-amber-500"} flex items-center justify-center flex-shrink-0`}
           >
-            {React.createElement(faq.icon || HelpCircle, { className: "text-white text-xl" })}
+            {React.createElement(faq.icon || HelpCircle, { className: "text-white text-lg sm:text-xl" })}
           </motion.div>
-          <span className="font-bold text-lg text-gray-800">{faq.question}</span>
+          <span className="font-bold text-sm sm:text-lg text-gray-800 leading-tight">{faq.question}</span>
         </motion.div>
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.3 }}
-          className="text-gray-400"
+          className="text-gray-400 ml-2 flex-shrink-0"
         >
-          <ChevronDown className="w-6 h-6" />
+          <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6" />
         </motion.div>
 
         {/* Hover effect */}
@@ -1209,9 +1227,9 @@ const FAQItem = ({ faq, index }: FAQItemProps) => {
             transition={{ duration: 0.4, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <div className="px-8 pb-8">
+            <div className="px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6 lg:pb-8">
               <motion.p 
-                className="text-gray-600 leading-relaxed text-lg pl-20"
+                className="text-gray-600 leading-relaxed text-sm sm:text-base pl-15 sm:pl-20"
                 initial={{ y: -10 }}
                 animate={{ y: 0 }}
                 transition={{ delay: 0.1 }}
