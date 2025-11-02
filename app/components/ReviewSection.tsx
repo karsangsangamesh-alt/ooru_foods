@@ -118,7 +118,7 @@ const ReviewCard = ({ review }: { review: Review }) => {
           ease: [0.25, 0.46, 0.45, 0.94]
         }
       }}
-      className="bg-gradient-to-br from-white via-gray-50 to-orange-50/30 rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-lg hover:shadow-2xl hover:shadow-orange-100/60 transition-all duration-500 border border-orange-100/40 backdrop-blur-sm flex-shrink-0 w-[320px] sm:w-[360px] md:w-[400px] lg:w-[440px] xl:w-[480px] group relative overflow-hidden"
+      className="bg-gradient-to-br from-white via-gray-50 to-orange-50/30 rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-8 shadow-lg hover:shadow-2xl hover:shadow-orange-100/60 transition-all duration-500 border border-orange-100/40 backdrop-blur-sm flex-shrink-0 w-[260px] sm:w-[280px] md:w-[350px] lg:w-[400px] xl:w-[440px] group relative overflow-hidden"
     >
       {/* Decorative gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -127,10 +127,10 @@ const ReviewCard = ({ review }: { review: Review }) => {
       <div className="absolute top-4 right-4 w-2 h-2 bg-orange-300/40 rounded-full animate-pulse" />
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 md:mb-6 relative z-10">
-        <div className="flex items-center space-x-3 md:space-x-4">
+      <div className="flex items-center justify-between mb-3 md:mb-6 relative z-10">
+        <div className="flex items-center space-x-2 md:space-x-4">
           <motion.div 
-            className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-orange-400 via-orange-500 to-amber-600 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-base shadow-lg ring-4 ring-white/20"
+            className="w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-orange-400 via-orange-500 to-amber-600 rounded-full flex items-center justify-center text-white font-bold text-xs md:text-base shadow-lg ring-2 md:ring-4 ring-white/20"
             whileHover={{ scale: 1.1, rotate: 5 }}
             transition={{ duration: 0.3 }}
           >
@@ -138,7 +138,7 @@ const ReviewCard = ({ review }: { review: Review }) => {
           </motion.div>
           <div>
             <motion.h4 
-              className="font-semibold text-gray-900 text-sm md:text-base mb-1"
+              className="font-semibold text-gray-900 text-xs md:text-base mb-0.5 md:mb-1 line-clamp-1"
               initial={{ opacity: 0, x: -10 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
@@ -146,15 +146,15 @@ const ReviewCard = ({ review }: { review: Review }) => {
               {review.name}
             </motion.h4>
             <motion.p 
-              className="text-xs md:text-sm text-gray-500 flex items-center"
+              className="text-xs md:text-sm text-gray-500 flex items-center line-clamp-1"
               initial={{ opacity: 0, x: -10 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-2 h-2 md:w-3 md:h-3 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
               </svg>
-              {review.location}
+              <span className="truncate">{review.location}</span>
             </motion.p>
           </div>
         </div>
