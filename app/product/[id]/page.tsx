@@ -275,7 +275,7 @@ export default function ProductDetailPage() {
         transition={{ duration: 0.6 }}
         className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-red-50"
       >
-        {/* Hero Section - Story First */}
+        {/* Mobile-First Hero Section */}
         <section className="relative min-h-screen flex items-center overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-5">
@@ -285,55 +285,55 @@ export default function ProductDetailPage() {
             }} />
           </div>
 
-          <div className="container mx-auto px-6 relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center min-h-screen py-20">
-              {/* Story Content */}
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center min-h-screen py-8 sm:py-12 lg:py-20">
+              {/* Mobile-First Story Content */}
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="space-y-8"
+                className="space-y-4 sm:space-y-6 lg:space-y-8 order-2 lg:order-1"
               >
-                {/* Breadcrumb */}
+                {/* Mobile-First Breadcrumb */}
                 <motion.nav 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="flex items-center space-x-2 text-sm text-gray-600"
+                  className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600"
                 >
                   <Link href="/" className="hover:text-orange-600 transition-colors">Home</Link>
                   <span>/</span>
                   <Link href="/shop" className="hover:text-orange-600 transition-colors">Shop</Link>
                   <span>/</span>
-                  <span className="text-orange-600 font-medium">{product.name}</span>
+                  <span className="text-orange-600 font-medium truncate">{product.name}</span>
                 </motion.nav>
 
-                {/* Product Badge */}
+                {/* Mobile-First Product Badge */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="flex items-center space-x-4"
+                  className="flex flex-wrap items-center gap-2 sm:gap-4"
                 >
-                  <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center space-x-2">
-                    <Award className="w-4 h-4" />
+                  <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-semibold flex items-center space-x-2">
+                    <Award className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span>Heritage Recipe</span>
                   </span>
                   {product.is_vegetarian && (
-                    <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
-                      <Leaf className="w-4 h-4" />
+                    <span className="bg-green-100 text-green-800 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium flex items-center space-x-1">
+                      <Leaf className="w-3 h-3 sm:w-4 sm:h-4" />
                       <span>100% Vegetarian</span>
                     </span>
                   )}
                 </motion.div>
 
-                {/* Title with Animation */}
+                {/* Mobile-First Title */}
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
                 >
-                  <h1 className="text-5xl lg:text-7xl font-bold text-gray-800 leading-tight">
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-800 leading-tight">
                     {product.name.split(' ').map((word, index) => (
                       <motion.span
                         key={index}
@@ -348,41 +348,42 @@ export default function ProductDetailPage() {
                   </h1>
                 </motion.div>
 
-                {/* Story Excerpt */}
+                {/* Mobile-First Story Excerpt */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.8 }}
-                  className="space-y-6"
+                  className="space-y-4 sm:space-y-6"
                 >
-                  <p className="text-xl text-gray-700 leading-relaxed font-medium">
-                    {product.story && product.story.length > 200 
-                      ? `${product.story.substring(0, 200)}...` 
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-700 leading-relaxed font-medium">
+                    {product.story && product.story.length > 150 
+                      ? `${product.story.substring(0, 150)}...` 
                       : product.story || product.description
                     }
                   </p>
                   
-                  {/* Story Progress Indicators */}
-                  <div className="flex items-center space-x-4">
+                  {/* Mobile-Friendly Story Progress Indicators */}
+                  <div className="flex justify-center sm:justify-start items-center space-x-3 sm:space-x-4 overflow-x-auto pb-2">
                     {storySections.map((section, index) => {
                       const Icon = section.icon;
                       return (
                         <motion.div
                           key={index}
-                          className={`flex flex-col items-center space-y-2 cursor-pointer transition-all duration-300 ${
+                          className={`flex flex-col items-center space-y-1 sm:space-y-2 cursor-pointer transition-all duration-300 min-w-[60px] ${
                             activeStorySection === index ? 'text-orange-600' : 'text-gray-400'
                           }`}
                           onClick={() => setActiveStorySection(index)}
-                          whileHover={{ scale: 1.1 }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                         >
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+                          <div className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
                             activeStorySection === index 
-                              ? 'bg-black-100 border-2 border-orange-500' 
+                              ? 'bg-orange-100 border-2 border-orange-500' 
                               : 'bg-gray-100'
                           }`}>
-                            <Icon className="w-6 h-6" />
+                            <Icon className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
                           </div>
-                          <div className="text-center">
+                          <div className="text-center hidden sm:block">
                             <p className="text-xs font-medium">{section.title}</p>
                             <p className="text-xs text-gray-500">{section.subtitle}</p>
                           </div>
@@ -392,18 +393,18 @@ export default function ProductDetailPage() {
                   </div>
                 </motion.div>
 
-                {/* Rating & Reviews */}
+                {/* Mobile-First Rating & Reviews */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1 }}
-                  className="flex items-center space-x-4"
+                  className="flex items-center space-x-2 sm:space-x-4"
                 >
                   <div className="flex items-center space-x-1">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`w-5 h-5 ${
+                        className={`w-4 h-4 sm:w-5 sm:h-5 ${
                           i < Math.floor(product.rating || 4.5) 
                             ? 'text-yellow-400 fill-current' 
                             : 'text-gray-300'
@@ -411,23 +412,23 @@ export default function ProductDetailPage() {
                       />
                     ))}
                   </div>
-                  <span className="text-lg font-semibold text-gray-800">{product.rating || 4.5}</span>
-                  <span className="text-gray-600">({product.reviews_count || 127} stories shared)</span>
+                  <span className="text-sm sm:text-base lg:text-lg font-semibold text-gray-800">{product.rating || 4.5}</span>
+                  <span className="text-xs sm:text-sm text-gray-600">({product.reviews_count || 127} stories shared)</span>
                 </motion.div>
               </motion.div>
 
-              {/* Product Visual */}
+              {/* Mobile-First Product Visual */}
               <motion.div
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="relative"
+                className="relative order-1 lg:order-2"
               >
-                {/* Main Product Image */}
+                {/* Mobile-First Main Product Image */}
                 <div className="relative group">
                   <motion.div
-                    className="relative bg-white rounded-3xl shadow-2xl overflow-hidden"
-                    whileHover={{ scale: 1.02 }}
+                    className="relative bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden"
+                    whileHover={{ scale: 1.01 }}
                     transition={{ duration: 0.3 }}
                   >
                     {!imageLoaded && (
@@ -435,7 +436,7 @@ export default function ProductDetailPage() {
                         <motion.div
                           animate={{ opacity: [0.5, 1, 0.5] }}
                           transition={{ duration: 2, repeat: Infinity }}
-                          className="w-16 h-16 bg-orange-300 rounded-full"
+                          className="w-12 h-12 sm:w-16 sm:h-16 bg-orange-300 rounded-full"
                         />
                       </div>
                     )}
@@ -443,7 +444,7 @@ export default function ProductDetailPage() {
                     <motion.img
                       src={product.image_url || '/placeholder-food.svg'}
                       alt={product.name}
-                      className={`w-full h-96 object-cover ${!imageLoaded ? 'opacity-0' : 'opacity-100'}`}
+                      className={`w-full h-64 sm:h-72 md:h-80 lg:h-96 object-cover ${!imageLoaded ? 'opacity-0' : 'opacity-100'}`}
                       onError={handleImageError}
                       onLoad={() => setImageLoaded(true)}
                       initial={{ scale: 1.1, opacity: 0 }}
@@ -451,65 +452,65 @@ export default function ProductDetailPage() {
                       transition={{ duration: 0.8, delay: 0.6 }}
                     />
 
-                    {/* Floating Elements */}
+                    {/* Mobile-First Floating Elements */}
                     <motion.div
                       initial={{ opacity: 0, scale: 0 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 1.2 }}
-                      className="absolute top-6 right-6"
+                      className="absolute top-4 right-4"
                     >
                       <button
                         onClick={() => setIsWishlisted(!isWishlisted)}
-                        className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+                        className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
                           isWishlisted 
                             ? 'bg-red-500 text-white shadow-lg' 
                             : 'bg-white text-gray-400 hover:text-red-500 shadow-md'
                         }`}
                       >
-                        <Heart className={`w-6 h-6 ${isWishlisted ? 'fill-current' : ''}`} />
+                        <Heart className={`w-5 h-5 sm:w-6 sm:h-6 ${isWishlisted ? 'fill-current' : ''}`} />
                       </button>
                     </motion.div>
 
-                    {/* Spice Level Badge */}
+                    {/* Mobile-First Spice Level Badge */}
                     <motion.div
                       initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 1 }}
-                      className="absolute top-6 left-6"
+                      className="absolute top-4 left-4"
                     >
-                      <div className={`${spiceInfo.bgClass} px-4 py-2 rounded-full text-white font-semibold text-sm flex items-center space-x-1`}>
+                      <div className={`${spiceInfo.bgClass} px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-white font-semibold text-xs sm:text-sm flex items-center space-x-1`}>
                         <span>{spiceInfo.icon}</span>
                         <span>{spiceInfo.text}</span>
                       </div>
                     </motion.div>
 
-                    {/* Heritage Badge */}
+                    {/* Mobile-First Heritage Badge */}
                     <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 1.1 }}
-                      className="absolute bottom-6 left-6"
+                      className="absolute bottom-4 left-4"
                     >
-                      <div className="bg-black bg-opacity-70 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium flex items-center space-x-2">
-                        <Clock className="w-4 h-4" />
+                      <div className="bg-black bg-opacity-70 backdrop-blur-sm text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium flex items-center space-x-1 sm:space-x-2">
+                        <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                         <span>Traditional Recipe</span>
                       </div>
                     </motion.div>
                   </motion.div>
 
-                  {/* Floating Price Card */}
+                  {/* Mobile-First Floating Price Card */}
                   <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 1.3 }}
-                    className="absolute -bottom-8 -right-8 bg-gradient-to-br from-orange-500 to-red-500 text-white p-6 rounded-2xl shadow-xl"
+                    className="absolute -bottom-4 -right-4 sm:-bottom-8 sm:-right-8 bg-gradient-to-br from-orange-500 to-red-500 text-white p-3 sm:p-6 rounded-xl sm:rounded-2xl shadow-xl"
                   >
                     <div className="text-center">
-                      <p className="text-sm opacity-90">Starting from</p>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-3xl font-bold">₹{product.price}</span>
+                      <p className="text-xs sm:text-sm opacity-90">Starting from</p>
+                      <div className="flex items-center space-x-1 sm:space-x-2">
+                        <span className="text-xl sm:text-2xl lg:text-3xl font-bold">₹{product.price}</span>
                         {product.original_price && (
-                          <span className="text-sm opacity-75 line-through">₹{product.original_price}</span>
+                          <span className="text-xs sm:text-sm opacity-75 line-through">₹{product.original_price}</span>
                         )}
                       </div>
                     </div>
@@ -519,24 +520,24 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          {/* Scroll Indicator */}
+          {/* Mobile-First Scroll Indicator */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 2 }}
-            className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+            className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2"
           >
             <motion.div
-              animate={{ y: [0, 10, 0] }}
+              animate={{ y: [0, 8, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="flex flex-col items-center space-y-2 text-gray-400"
+              className="flex flex-col items-center space-y-1 sm:space-y-2 text-gray-400"
             >
-              <span className="text-sm">Discover the Story</span>
-              <div className="w-6 h-10 border-2 border-gray-300 rounded-full flex justify-center">
+              <span className="text-xs sm:text-sm">Discover the Story</span>
+              <div className="w-4 h-6 sm:w-6 sm:h-10 border-2 border-gray-300 rounded-full flex justify-center">
                 <motion.div
-                  animate={{ y: [0, 12, 0] }}
+                  animate={{ y: [0, 10, 0] }}
                   transition={{ duration: 2, repeat: Infinity }}
-                  className="w-1 h-3 bg-gray-400 rounded-full mt-2"
+                  className="w-1 h-2 sm:h-3 bg-gray-400 rounded-full mt-1 sm:mt-2"
                 />
               </div>
             </motion.div>
@@ -746,8 +747,8 @@ export default function ProductDetailPage() {
           </div>
         </section>
 
-        {/* Enhanced Purchase Section */}
-        <section className="py-12 md:py-20 bg-gray-50">
+        {/* Mobile-First Enhanced Purchase Section */}
+        <section className="py-8 sm:py-12 md:py-20 bg-gray-50">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-5xl mx-auto">
               <motion.div
@@ -757,45 +758,46 @@ export default function ProductDetailPage() {
                 viewport={{ once: true }}
                 className="bg-white rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden border border-gray-100"
               >
-                <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[500px] lg:min-h-[600px]">
-                  {/* Product Information Side */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[400px] sm:min-h-[500px] lg:min-h-[600px]">
+                  {/* Mobile-First Product Information Side */}
                   <div className="relative bg-gradient-to-br from-orange-50 to-red-50 p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-center">
-                    {/* Decorative Elements */}
-                    <div className="hidden sm:block absolute top-6 right-6 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-br from-orange-200 to-red-200 rounded-full opacity-20 blur-xl" />
-                    <div className="hidden sm:block absolute bottom-6 left-6 w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-gradient-to-br from-red-200 to-orange-200 rounded-full opacity-20 blur-xl" />
+                    {/* Mobile-First Decorative Elements */}
+                    <div className="hidden md:block absolute top-6 right-6 w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-orange-200 to-red-200 rounded-full opacity-20 blur-xl" />
+                    <div className="hidden md:block absolute bottom-6 left-6 w-20 h-20 lg:w-28 lg:h-28 bg-gradient-to-br from-red-200 to-orange-200 rounded-full opacity-20 blur-xl" />
                     
-                    <div className="relative z-10">
-                      {/* Product Badge */}
+                    <div className="relative z-10 space-y-4 sm:space-y-6">
+                      {/* Mobile-First Product Badge */}
                       <motion.div
                         initial={{ opacity: 0, scale: 0.2 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.2 }}
-                        className="flex items-center space-x-3 mb-6"
+                        className="flex flex-wrap items-center gap-2 sm:gap-3"
                       >
-                        <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-5 py-2 rounded-full text-sm font-semibold flex items-center space-x-2 shadow-lg">
-                          <Award className="w-4 h-4" />
+                        <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 sm:px-4 lg:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold flex items-center space-x-1 sm:space-x-2 shadow-lg">
+                          <Award className="w-3 h-3 sm:w-4 sm:h-4" />
                           <span>Heritage Recipe</span>
                         </div>
                         {product.is_vegetarian && (
-                          <div className="bg-green-100 text-green-800 px-3 py-2 rounded-full text-sm font-medium flex items-center space-x-1">
-                            <Leaf className="w-4 h-4" />
+                          <div className="bg-green-100 text-green-800 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium flex items-center space-x-1">
+                            <Leaf className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span>100% Vegetarian</span>
                           </div>
                         )}
                       </motion.div>
-                       {/* Product Image */}
+                      
+                      {/* Mobile-First Product Image */}
                       <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.5 }}
-                        className="w-full flex justify-center bg-white rounded-2xl shadow-lg overflow-hidden mb-6 p-4 lg:p-6"
+                        className="w-full flex justify-center bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden mb-4 sm:mb-6 p-3 sm:p-4 lg:p-6"
                       >
-                        <div className="relative w-full max-w-[280px] sm:max-w-[350px] md:max-w-md aspect-square mx-auto">
+                        <div className="relative w-full max-w-[200px] sm:max-w-[280px] md:max-w-[350px] aspect-square mx-auto">
                           <Image 
                             src={product.image_url || '/placeholder-food.svg'}
                             alt={product.name}
                             fill
-                            sizes="(max-width: 768px) 90vw, (max-width: 1200px) 50vw, 40vw"
+                            sizes="(max-width: 640px) 80vw, (max-width: 1024px) 50vw, 40vw"
                             className="object-contain drop-shadow-lg"
                             priority
                             quality={100}
@@ -803,72 +805,69 @@ export default function ProductDetailPage() {
                         </div>
                       </motion.div>
 
-                      {/* Product Title */}
+                      {/* Mobile-First Product Title */}
                       <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight"
+                        className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 sm:mb-4 leading-tight"
                       >
                         {product.name}
                       </motion.h2>
 
-                      {/* Product Description */}
+                      {/* Mobile-First Product Description */}
                       <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
-                        className="text-gray-600 text-base md:text-lg mb-6 leading-relaxed"
+                        className="text-gray-600 text-sm sm:text-base md:text-lg mb-4 sm:mb-6 leading-relaxed"
                       >
                         {product.description}
                       </motion.p>
-                     {/* Rating */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      className="flex items-center space-x-3 mb-6"
-                    >
-                      <div className="flex items-center space-x-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-5 h-5 ${
-                              i < Math.floor(product.rating || 4.5) 
-                                ? 'text-yellow-400 fill-current' 
-                                : 'text-gray-300'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-lg font-semibold text-gray-800">{product.rating || 4.5}</span>
-                      <span className="text-gray-600">({product.reviews_count || 127} reviews)</span>
-                    </motion.div>
-                     
-
                       
+                      {/* Mobile-First Rating */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6"
+                      >
+                        <div className="flex items-center space-x-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                                i < Math.floor(product.rating || 4.5) 
+                                  ? 'text-yellow-400 fill-current' 
+                                  : 'text-gray-300'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm sm:text-base lg:text-lg font-semibold text-gray-800">{product.rating || 4.5}</span>
+                        <span className="text-xs sm:text-sm text-gray-600">({product.reviews_count || 127} reviews)</span>
+                      </motion.div>
                     </div>
                   </div>
 
-                  {/* Purchase Controls Side */}
-                  <div className="p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-center">
-
-                    {/* Quantity Selector */}
+                  {/* Mobile-First Purchase Controls Side */}
+                  <div className="p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-center space-y-4 sm:space-y-6">
+                    {/* Mobile-First Quantity Selector */}
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
-                      className="mb-8 w-full"
+                      className="w-full"
                     >
-                      <div className="flex flex-col items-center justify-center space-y-4">
-                        <label className="block text-lg font-semibold text-gray-800">Quantity</label>
-                        <div className="flex items-center justify-center space-x-4">
+                      <div className="flex flex-col items-center justify-center space-y-3 sm:space-y-4">
+                        <label className="block text-base sm:text-lg font-semibold text-gray-800">Quantity</label>
+                        <div className="flex items-center justify-center space-x-3 sm:space-x-4">
                           <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleQuantityChange(quantity - 1)}
                             disabled={quantity <= 1}
-                            className={`w-14 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center font-bold text-xl transition-all duration-200 ${
+                            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center font-bold text-lg sm:text-xl transition-all duration-200 ${
                               quantity <= 1
                                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200 shadow-sm'
@@ -877,8 +876,8 @@ export default function ProductDetailPage() {
                             -
                           </motion.button>
                           
-                          <div className="w-20 h-12 md:w-24 md:h-14 bg-gray-50 border-2 border-gray-200 rounded-xl flex items-center justify-center">
-                            <span className="text-2xl font-bold text-gray-800">{quantity}</span>
+                          <div className="w-16 h-12 sm:w-20 sm:h-14 bg-gray-50 border-2 border-gray-200 rounded-xl flex items-center justify-center">
+                            <span className="text-xl sm:text-2xl font-bold text-gray-800">{quantity}</span>
                           </div>
                           
                           <motion.button
@@ -886,7 +885,7 @@ export default function ProductDetailPage() {
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleQuantityChange(quantity + 1)}
                             disabled={quantity >= 10}
-                            className={`w-14 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center font-bold text-xl transition-all duration-200 ${
+                            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center font-bold text-lg sm:text-xl transition-all duration-200 ${
                               quantity >= 10
                                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200 shadow-sm'
@@ -898,24 +897,24 @@ export default function ProductDetailPage() {
                       </div>
                     </motion.div>
 
-                    {/* Total Price */}
+                    {/* Mobile-First Total Price */}
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 }}
-                      className="text-center mb-8 p-4 bg-gray-50 rounded-xl"
+                      className="text-center p-3 sm:p-4 bg-gray-50 rounded-xl"
                     >
-                      <p className="text-gray-600 mb-2">Total Price</p>
-                      <div className="text-3xl md:text-4xl font-bold text-gray-900">₹{(product.price * quantity).toFixed(2)}</div>
+                      <p className="text-sm sm:text-base text-gray-600 mb-1 sm:mb-2">Total Price</p>
+                      <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">₹{(product.price * quantity).toFixed(2)}</div>
                     </motion.div>
 
-                    {/* Add to Cart Button */}
+                    {/* Mobile-First Add to Cart Button */}
                     <motion.button
                       onClick={handleAddToCart}
                       disabled={addingToCart || !(product.in_stock ?? (product.stock > 0))}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`w-full py-4 md:py-6 px-6 md:px-8 rounded-xl font-bold text-lg md:text-xl transition-all duration-300 shadow-lg ${
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
+                      className={`w-full py-3 sm:py-4 md:py-6 px-4 sm:px-6 md:px-8 rounded-xl font-bold text-sm sm:text-lg md:text-xl transition-all duration-300 shadow-lg min-h-[48px] ${
                         !(product.in_stock ?? (product.stock > 0))
                           ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                           : addingToCart
@@ -924,58 +923,58 @@ export default function ProductDetailPage() {
                       }`}
                     >
                       {addingToCart ? (
-                        <div className="flex items-center justify-center space-x-3">
+                        <div className="flex items-center justify-center space-x-2 sm:space-x-3">
                           <motion.div
                             animate={{ rotate: 360 }}
                             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                            className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                            className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full"
                           />
-                          <span>Adding to cart...</span>
+                          <span className="text-sm sm:text-base">Adding to cart...</span>
                         </div>
                       ) : !(product.in_stock ?? (product.stock > 0)) ? (
                         'Out of Stock'
                       ) : (
                         <div className="flex items-center justify-center space-x-2">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.68 4.24M7 13v8a2 2 0 002 2h8a2 2 0 002-2v-8M7 13v8" />
                           </svg>
-                          <span>Add {quantity} to Cart</span>
+                          <span className="text-sm sm:text-base">Add {quantity} to Cart</span>
                         </div>
                       )}
                     </motion.button>
 
-                    {/* Trust Indicators */}
+                    {/* Mobile-First Trust Indicators */}
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.6 }}
-                      className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center"
+                      className="mt-4 sm:mt-8 grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-center"
                     >
-                      <div className="flex flex-col items-center space-y-2 p-3 bg-green-50 rounded-lg">
-                        <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="flex flex-col items-center space-y-1 sm:space-y-2 p-2 sm:p-3 bg-green-50 rounded-lg">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full flex items-center justify-center">
+                          <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                           </svg>
                         </div>
-                        <span className="text-sm font-medium text-green-800">Fresh Daily</span>
+                        <span className="text-xs sm:text-sm font-medium text-green-800">Fresh Daily</span>
                       </div>
                       
-                      <div className="flex flex-col items-center space-y-2 p-3 bg-blue-50 rounded-lg">
-                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="flex flex-col items-center space-y-1 sm:space-y-2 p-2 sm:p-3 bg-blue-50 rounded-lg">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                          <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                         </div>
-                        <span className="text-sm font-medium text-blue-800">No Preservatives</span>
+                        <span className="text-xs sm:text-sm font-medium text-blue-800">No Preservatives</span>
                       </div>
                       
-                      <div className="flex flex-col items-center space-y-2 p-3 bg-orange-50 rounded-lg">
-                        <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="flex flex-col items-center space-y-1 sm:space-y-2 p-2 sm:p-3 bg-orange-50 rounded-lg">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                          <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                           </svg>
                         </div>
-                        <span className="text-sm font-medium text-orange-800">Family Recipe</span>
+                        <span className="text-xs sm:text-sm font-medium text-orange-800">Family Recipe</span>
                       </div>
                     </motion.div>
                   </div>

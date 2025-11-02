@@ -294,13 +294,13 @@ function ShopPage() {
           transition={{ duration: 0.8 }}
           className="text-center max-w-4xl mx-auto px-4"
         >
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-800 mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-4 sm:mb-6">
             Taste the{' '}
             <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
               Story
             </span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 leading-relaxed px-4">
             Every jar tells a tale of tradition, passion, and authentic flavors. 
             Discover our handcrafted chutneys that bring families together.
           </p>
@@ -320,76 +320,78 @@ function ShopPage() {
             <p className="text-gray-600">Select your spice preference to explore curated collections</p>
           </motion.div>
 
-          {/* Circular Category Navigation */}
+          {/* Mobile-First Category Navigation */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex justify-center items-center space-x-8 lg:space-x-16"
+            className="overflow-x-auto pb-4"
           >
-            {categories.map((category, index) => {
-              const Icon = category.icon;
-              const isSelected = selectedCategory === category.id;
-              
-              return (
-                <motion.button
-                  key={category.id}
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 + index * 0.1 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleCategorySelect(category.id)}
-                  className="relative group"
-                  aria-label={`Select ${category.name} category`}
-                >
-                  {/* Outer Ring */}
-                  <motion.div
-                    className={`w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br ${category.color} p-1 shadow-xl`}
-                    animate={{
-                      boxShadow: isSelected 
-                        ? '0 0 30px rgba(249, 115, 22, 0.5)' 
-                        : '0 10px 25px rgba(0, 0, 0, 0.1)'
-                    }}
-                    transition={{ duration: 0.3 }}
+            <div className="flex justify-start items-center space-x-4 sm:space-x-6 lg:space-x-8 min-w-max px-4">
+              {categories.map((category, index) => {
+                const Icon = category.icon;
+                const isSelected = selectedCategory === category.id;
+                
+                return (
+                  <motion.button
+                    key={category.id}
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 + index * 0.1 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleCategorySelect(category.id)}
+                    className="relative group flex-shrink-0"
+                    aria-label={`Select ${category.name} category`}
                   >
-                    {/* Inner Circle */}
-                    <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center">
-                      <Icon className={`w-8 h-8 md:w-10 md:h-10 mb-2 ${
-                        isSelected ? 'text-orange-500' : 'text-gray-600'
-                      }`} />
-                      <span className={`text-sm md:text-base font-semibold ${
-                        isSelected ? 'text-orange-500' : 'text-gray-700'
-                      }`}>
-                        {category.name}
-                      </span>
-                    </div>
-                  </motion.div>
-
-                  {/* Selection Indicator */}
-                  {isSelected && (
+                    {/* Mobile-First Outer Ring */}
                     <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-2 -right-2 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center"
+                      className={`w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full bg-gradient-to-br ${category.color} p-1 shadow-xl`}
+                      animate={{
+                        boxShadow: isSelected 
+                          ? '0 0 20px rgba(249, 115, 22, 0.5)' 
+                          : '0 5px 15px rgba(0, 0, 0, 0.1)'
+                      }}
+                      transition={{ duration: 0.3 }}
                     >
-                      <div className="w-3 h-3 bg-white rounded-full" />
+                      {/* Inner Circle */}
+                      <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center p-1 sm:p-2">
+                        <Icon className={`w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 mb-1 sm:mb-2 ${
+                          isSelected ? 'text-orange-500' : 'text-gray-600'
+                        }`} />
+                        <span className={`text-xs sm:text-sm md:text-base font-semibold text-center leading-tight ${
+                          isSelected ? 'text-orange-500' : 'text-gray-700'
+                        }`}>
+                          {category.name}
+                        </span>
+                      </div>
                     </motion.div>
-                  )}
 
-                  {/* Category Description */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: isSelected ? 1 : 0 }}
-                    className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 whitespace-nowrap"
-                  >
-                    <p className="text-xs text-gray-500 text-center max-w-32">
-                      {category.description}
-                    </p>
-                  </motion.div>
-                </motion.button>
-              );
-            })}
+                    {/* Selection Indicator */}
+                    {isSelected && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-orange-500 rounded-full flex items-center justify-center"
+                      >
+                        <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 bg-white rounded-full" />
+                      </motion.div>
+                    )}
+
+                    {/* Category Description - Hidden on mobile, visible on larger screens */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: isSelected ? 1 : 0 }}
+                      className="absolute -bottom-8 sm:-bottom-10 md:-bottom-12 left-1/2 transform -translate-x-1/2 whitespace-nowrap hidden sm:block"
+                    >
+                      <p className="text-xs text-gray-500 text-center max-w-24 sm:max-w-32">
+                        {category.description}
+                      </p>
+                    </motion.div>
+                  </motion.button>
+                );
+              })}
+            </div>
           </motion.div>
         </div>
       </section>
