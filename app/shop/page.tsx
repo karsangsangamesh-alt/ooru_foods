@@ -286,21 +286,21 @@ function ShopPage() {
         )}
       </AnimatePresence>
 
-      {/* Hero Section */}
-      <section className="relative py-16 overflow-hidden">
+      {/* Hero Section - Fixed spacing for header overlap */}
+      <section className="relative pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 overflow-hidden">
         <motion.div
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="text-center max-w-4xl mx-auto px-4"
         >
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-800 mb-3 sm:mb-4 md:mb-6">
             Taste the{' '}
             <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
               Story
             </span>
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 leading-relaxed px-4">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 mb-4 sm:mb-6 md:mb-8 leading-relaxed px-2 sm:px-4">
             Every jar tells a tale of tradition, passion, and authentic flavors. 
             Discover our handcrafted chutneys that bring families together.
           </p>
@@ -320,14 +320,14 @@ function ShopPage() {
             <p className="text-gray-600">Select your spice preference to explore curated collections</p>
           </motion.div>
 
-          {/* Mobile-First Category Navigation */}
+          {/* Mobile-First Category Navigation - Fixed sizing and overflow */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             className="overflow-x-auto pb-4"
           >
-            <div className="flex justify-start items-center space-x-4 sm:space-x-6 lg:space-x-8 min-w-max px-4">
+            <div className="flex justify-start items-center space-x-3 sm:space-x-4 lg:space-x-6 min-w-max px-2 sm:px-4">
               {categories.map((category, index) => {
                 const Icon = category.icon;
                 const isSelected = selectedCategory === category.id;
@@ -344,9 +344,9 @@ function ShopPage() {
                     className="relative group flex-shrink-0"
                     aria-label={`Select ${category.name} category`}
                   >
-                    {/* Mobile-First Outer Ring */}
+                    {/* Mobile-First Outer Ring - Fixed size to prevent edge cutting */}
                     <motion.div
-                      className={`w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full bg-gradient-to-br ${category.color} p-1 shadow-xl`}
+                      className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 rounded-full bg-gradient-to-br ${category.color} p-1 shadow-xl`}
                       animate={{
                         boxShadow: isSelected 
                           ? '0 0 20px rgba(249, 115, 22, 0.5)' 
@@ -355,8 +355,8 @@ function ShopPage() {
                       transition={{ duration: 0.3 }}
                     >
                       {/* Inner Circle */}
-                      <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center p-1 sm:p-2">
-                        <Icon className={`w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 mb-1 sm:mb-2 ${
+                      <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center p-1">
+                        <Icon className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-8 lg:h-8 mb-0.5 sm:mb-1 ${
                           isSelected ? 'text-orange-500' : 'text-gray-600'
                         }`} />
                         <span className={`text-xs sm:text-sm md:text-base font-semibold text-center leading-tight ${
@@ -372,9 +372,9 @@ function ShopPage() {
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-orange-500 rounded-full flex items-center justify-center"
+                        className="absolute -top-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 bg-orange-500 rounded-full flex items-center justify-center"
                       >
-                        <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 bg-white rounded-full" />
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full" />
                       </motion.div>
                     )}
 
@@ -382,9 +382,9 @@ function ShopPage() {
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: isSelected ? 1 : 0 }}
-                      className="absolute -bottom-8 sm:-bottom-10 md:-bottom-12 left-1/2 transform -translate-x-1/2 whitespace-nowrap hidden sm:block"
+                      className="absolute -bottom-6 sm:-bottom-8 md:-bottom-10 left-1/2 transform -translate-x-1/2 whitespace-nowrap hidden md:block"
                     >
-                      <p className="text-xs text-gray-500 text-center max-w-24 sm:max-w-32">
+                      <p className="text-xs text-gray-500 text-center max-w-20 sm:max-w-24">
                         {category.description}
                       </p>
                     </motion.div>
@@ -419,7 +419,7 @@ function ShopPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 1 }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8"
+              className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 xl:gap-8"
             >
               {filteredProducts.map((product, index) => (
                 <ProductCard
