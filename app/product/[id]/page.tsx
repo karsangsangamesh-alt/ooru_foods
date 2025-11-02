@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -8,7 +8,7 @@ import { CarouselProduct, fetchRelatedProducts, fetchProductById } from '../../l
 import Image from 'next/image';
 import { useCart } from '../../contexts/CartContext';
 import Carousel3D from '../../components/Carousel3D';
-import { Star, Heart, Clock, Users, Award, MapPin, ChefHat, Leaf, Sparkles, Utensils, Package } from 'lucide-react';
+import { Star, Heart, Clock, Users, Award, MapPin, ChefHat, Leaf, Sparkles, Utensils, Package, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface MockProduct {
   id: number;
@@ -56,6 +56,7 @@ export default function ProductDetailPage() {
   const [isWishlisted, setIsWishlisted] = useState(false);
   
   const { addToCart } = useCart();
+  const storyScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function loadProductData() {
@@ -185,6 +186,45 @@ export default function ProductDetailPage() {
     { icon: Heart, title: "The Tradition", subtitle: "Culinary Legacy" }
   ];
 
+  // Mobile-first horizontal scroll functions
+  const scrollToStorySection = (index: number) => {
+    if (storyScrollRef.current) {
+      const container = storyScrollRef.current;
+      const scrollAmount = container.scrollWidth / storySections.length;
+      container.scrollTo({
+        left: index * scrollAmount,
+        behavior: 'smooth'
+      });
+      setActiveStorySection(index);
+    }
+  };
+
+  const scrollLeft = () => {
+    if (storyScrollRef.current) {
+      const newIndex = Math.max(0, activeStorySection - 1);
+      scrollToStorySection(newIndex);
+    }
+  };
+
+  const scrollRight = () => {
+    if (storyScrollRef.current) {
+      const newIndex = Math.min(storySections.length - 1, activeStorySection + 1);
+      scrollToStorySection(newIndex);
+    }
+  };
+
+  // Handle scroll position tracking
+  const handleScroll = () => {
+    if (storyScrollRef.current) {
+      const container = storyScrollRef.current;
+      const scrollLeft = container.scrollLeft;
+      const scrollWidth = container.scrollWidth;
+      const containerWidth = container.clientWidth;
+      const currentIndex = Math.round((scrollLeft / (scrollWidth - containerWidth)) * (storySections.length - 1));
+      setActiveStorySection(Math.max(0, Math.min(storySections.length - 1, currentIndex)));
+    }
+  };
+
   // Dynamic spice level styling
   const getSpiceLevelInfo = (spiceLevel: string) => {
     switch (spiceLevel) {
@@ -275,17 +315,17 @@ export default function ProductDetailPage() {
         transition={{ duration: 0.6 }}
         className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-red-50"
       >
-        {/* Mobile-First Hero Section */}
+        {/* Mobile-First Hero Section with Fixed Z-Index */}
         <section className="relative min-h-screen flex items-center overflow-hidden">
           {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0 opacity-5 z-0">
             <div className="w-full h-full" style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f97316' fill-opacity='0.1'%3E%3Cpath d='M30 30c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20zM10 30c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
               backgroundSize: '80px 80px'
             }} />
           </div>
 
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center min-h-screen py-8 sm:py-12 lg:py-20">
               {/* Mobile-First Story Content */}
               <motion.div
@@ -372,7 +412,7 @@ export default function ProductDetailPage() {
                           className={`flex flex-col items-center space-y-1 sm:space-y-2 cursor-pointer transition-all duration-300 min-w-[60px] ${
                             activeStorySection === index ? 'text-orange-600' : 'text-gray-400'
                           }`}
-                          onClick={() => setActiveStorySection(index)}
+                          onClick={() => scrollToStorySection(index)}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                         >
@@ -417,22 +457,22 @@ export default function ProductDetailPage() {
                 </motion.div>
               </motion.div>
 
-              {/* Mobile-First Product Visual */}
+              {/* Mobile-First Product Visual with Fixed Z-Index */}
               <motion.div
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="relative order-1 lg:order-2"
+                className="relative order-1 lg:order-2 z-10"
               >
                 {/* Mobile-First Main Product Image */}
                 <div className="relative group">
                   <motion.div
-                    className="relative bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden"
+                    className="relative bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden z-10"
                     whileHover={{ scale: 1.01 }}
                     transition={{ duration: 0.3 }}
                   >
                     {!imageLoaded && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-orange-100 to-red-100">
+                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-orange-100 to-red-100 z-10">
                         <motion.div
                           animate={{ opacity: [0.5, 1, 0.5] }}
                           transition={{ duration: 2, repeat: Infinity }}
@@ -444,7 +484,7 @@ export default function ProductDetailPage() {
                     <motion.img
                       src={product.image_url || '/placeholder-food.svg'}
                       alt={product.name}
-                      className={`w-full h-64 sm:h-72 md:h-80 lg:h-96 object-cover ${!imageLoaded ? 'opacity-0' : 'opacity-100'}`}
+                      className={`w-full h-64 sm:h-72 md:h-80 lg:h-96 object-cover ${!imageLoaded ? 'opacity-0' : 'opacity-100'} relative z-10`}
                       onError={handleImageError}
                       onLoad={() => setImageLoaded(true)}
                       initial={{ scale: 1.1, opacity: 0 }}
@@ -457,7 +497,7 @@ export default function ProductDetailPage() {
                       initial={{ opacity: 0, scale: 0 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 1.2 }}
-                      className="absolute top-4 right-4"
+                      className="absolute top-4 right-4 z-20"
                     >
                       <button
                         onClick={() => setIsWishlisted(!isWishlisted)}
@@ -476,7 +516,7 @@ export default function ProductDetailPage() {
                       initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 1 }}
-                      className="absolute top-4 left-4"
+                      className="absolute top-4 left-4 z-20"
                     >
                       <div className={`${spiceInfo.bgClass} px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-white font-semibold text-xs sm:text-sm flex items-center space-x-1`}>
                         <span>{spiceInfo.icon}</span>
@@ -489,7 +529,7 @@ export default function ProductDetailPage() {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 1.1 }}
-                      className="absolute bottom-4 left-4"
+                      className="absolute bottom-4 left-4 z-20"
                     >
                       <div className="bg-black bg-opacity-70 backdrop-blur-sm text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium flex items-center space-x-1 sm:space-x-2">
                         <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -503,7 +543,7 @@ export default function ProductDetailPage() {
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 1.3 }}
-                    className="absolute -bottom-4 -right-4 sm:-bottom-8 sm:-right-8 bg-gradient-to-br from-orange-500 to-red-500 text-white p-3 sm:p-6 rounded-xl sm:rounded-2xl shadow-xl"
+                    className="absolute -bottom-4 -right-4 sm:-bottom-8 sm:-right-8 bg-gradient-to-br from-orange-500 to-red-500 text-white p-3 sm:p-6 rounded-xl sm:rounded-2xl shadow-xl z-10"
                   >
                     <div className="text-center">
                       <p className="text-xs sm:text-sm opacity-90">Starting from</p>
@@ -525,7 +565,7 @@ export default function ProductDetailPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 2 }}
-            className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2"
+            className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-10"
           >
             <motion.div
               animate={{ y: [0, 8, 0] }}
@@ -544,100 +584,156 @@ export default function ProductDetailPage() {
           </motion.div>
         </section>
 
-        {/* Story Section */}
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-6">
+        {/* Mobile-First Story Section with Horizontal Scroll */}
+        <section className="py-12 sm:py-16 md:py-20 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Mobile-First Story Header */}
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="text-center mb-16"
+              className="text-center mb-8 sm:mb-12 md:mb-16"
             >
-              <h2 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-4 sm:mb-6">
                 The Story Behind Every Bite
               </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
                 {product.story || product.long_description || `${product.description} This authentic recipe represents the rich culinary heritage passed down through generations, bringing the true flavors of tradition to your table.`}
               </p>
             </motion.div>
 
-            {/* Story Timeline */}
-            <div className="max-w-4xl mx-auto">
-              {storySections.map((section, index) => {
-                const Icon = section.icon;
-                const isEven = index % 2 === 0;
-                
-                return (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: isEven ? -50 : 50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, delay: index * 0.2 }}
-                    viewport={{ once: true }}
-                    className={`flex items-center mb-16 ${
-                      isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'
-                    }`}
-                  >
-                    <div className="flex-1 lg:px-8">
-                      <div className={`bg-gradient-to-br from-orange-50 to-red-50 p-8 rounded-2xl ${
-                        isEven ? 'lg:text-right' : 'lg:text-left'
-                      }`}>
-                        <h3 className="text-2xl font-bold text-gray-800 mb-4">{section.title}</h3>
-                        <p className="text-gray-600 leading-relaxed">
-                          {index === 0 && "Crafted with love and attention to detail, this recipe represents the essence of traditional cooking methods passed down through generations."}
-                          {index === 1 && "Born from the rich culinary traditions of South India, where spices and flavors come together to create something truly special."}
-                          {index === 2 && "Our family recipe, perfected over time, captures the authentic taste that can only come from years of tradition and expertise."}
-                          {index === 3 && "Every jar brings the same love and care that has been poured into this recipe for decades, ensuring each bite is a journey through time."}
+            {/* Mobile-First Horizontal Scroll Story Timeline */}
+            <div className="relative">
+              {/* Navigation Buttons */}
+              <div className="flex justify-between items-center mb-6 sm:mb-8">
+                <motion.button
+                  onClick={scrollLeft}
+                  disabled={activeStorySection === 0}
+                  whileHover={{ scale: activeStorySection > 0 ? 1.05 : 1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`p-2 sm:p-3 rounded-full transition-all duration-300 ${
+                    activeStorySection === 0 
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                      : 'bg-orange-100 text-orange-600 hover:bg-orange-200 shadow-md'
+                  }`}
+                >
+                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                </motion.button>
+
+                {/* Progress Indicators */}
+                <div className="flex space-x-2 sm:space-x-3">
+                  {storySections.map((_, index) => (
+                    <motion.div
+                      key={index}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        index === activeStorySection 
+                          ? 'w-8 sm:w-12 bg-orange-500' 
+                          : 'w-2 sm:w-3 bg-gray-300'
+                      }`}
+                      onClick={() => scrollToStorySection(index)}
+                      whileHover={{ scale: 1.2 }}
+                      whileTap={{ scale: 0.9 }}
+                    />
+                  ))}
+                </div>
+
+                <motion.button
+                  onClick={scrollRight}
+                  disabled={activeStorySection === storySections.length - 1}
+                  whileHover={{ scale: activeStorySection < storySections.length - 1 ? 1.05 : 1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`p-2 sm:p-3 rounded-full transition-all duration-300 ${
+                    activeStorySection === storySections.length - 1 
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                      : 'bg-orange-100 text-orange-600 hover:bg-orange-200 shadow-md'
+                  }`}
+                >
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                </motion.button>
+              </div>
+
+              {/* Horizontal Scroll Container */}
+              <div 
+                ref={storyScrollRef}
+                onScroll={handleScroll}
+                className="flex overflow-x-auto scrollbar-hide space-x-4 sm:space-x-6 lg:space-x-8 pb-4 snap-x snap-mandatory"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {storySections.map((section, index) => {
+                  const Icon = section.icon;
+                  
+                  return (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: 50 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                      className="flex-none w-80 sm:w-96 lg:w-[28rem] snap-center"
+                    >
+                      <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-orange-100">
+                        {/* Icon */}
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-lg mx-auto">
+                          <Icon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                        </div>
+                        
+                        {/* Title */}
+                        <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-3 sm:mb-4 text-center">
+                          {section.title}
+                        </h3>
+                        
+                        {/* Subtitle */}
+                        <p className="text-sm sm:text-base text-orange-600 font-medium text-center mb-4 sm:mb-6">
+                          {section.subtitle}
                         </p>
+                        
+                        {/* Content */}
+                        <div className="text-center">
+                          <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                            {index === 0 && "Crafted with love and attention to detail, this recipe represents the essence of traditional cooking methods passed down through generations."}
+                            {index === 1 && "Born from the rich culinary traditions of South India, where spices and flavors come together to create something truly special."}
+                            {index === 2 && "Our family recipe, perfected over time, captures the authentic taste that can only come from years of tradition and expertise."}
+                            {index === 3 && "Every jar brings the same love and care that has been poured into this recipe for decades, ensuring each bite is a journey through time."}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="relative">
-                      <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-lg">
-                        <Icon className="w-8 h-8 text-white" />
-                      </div>
-                      {index < storySections.length - 1 && (
-                        <div className="hidden lg:block absolute top-20 left-1/2 transform -translate-x-1/2 w-px h-16 bg-gradient-to-b from-orange-300 to-red-300" />
-                      )}
-                    </div>
-                    
-                    <div className="flex-1 lg:px-8" />
-                  </motion.div>
-                );
-              })}
+                    </motion.div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </section>
 
         {/* Premium Experience Section */}
-        <section className="py-20 bg-gradient-to-br from-orange-50 to-red-50">
-          <div className="container mx-auto px-6">
+        <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-orange-50 to-red-50">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="text-center mb-16"
+              className="text-center mb-12 sm:mb-16"
             >
-              <h2 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-4 sm:mb-6">
                 What Makes It Special
               </h2>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
               {/* Ingredients */}
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
-                className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
+                className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
               >
-                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mb-4 sm:mb-6 mx-auto">
                   <Leaf className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">Premium Ingredients</h3>
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 text-center">Premium Ingredients</h3>
                 <div className="space-y-3">
                   {product.ingredients ? (
                     product.ingredients.split(',').map((ingredient, index) => (
@@ -650,11 +746,11 @@ export default function ProductDetailPage() {
                         className="flex items-center space-x-3"
                       >
                         <div className="w-2 h-2 bg-orange-500 rounded-full" />
-                        <span className="text-gray-700">{ingredient.trim()}</span>
+                        <span className="text-gray-700 text-sm sm:text-base">{ingredient.trim()}</span>
                       </motion.div>
                     ))
                   ) : (
-                    <p className="text-gray-500 italic">Fresh, quality ingredients carefully selected for authentic taste.</p>
+                    <p className="text-gray-500 italic text-sm sm:text-base">Fresh, quality ingredients carefully selected for authentic taste.</p>
                   )}
                 </div>
               </motion.div>
@@ -665,30 +761,30 @@ export default function ProductDetailPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
                 viewport={{ once: true }}
-                className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
+                className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
               >
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mb-6 sm:mb-8 mx-auto">
                   <ChefHat className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-8 text-center">Chef&apos;s Secrets</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6 sm:mb-8 text-center">Chef's Secrets</h3>
+                <div className="grid grid-cols-1 gap-4 sm:gap-6">
                   {[
                     {
                       title: "Serving Suggestion",
                       tip: product.cooking_tips?.[0] || "Best enjoyed fresh with hot rice or dosas",
-                      icon: <Utensils className="w-6 h-6 text-orange-500" />,
+                      icon: <Utensils className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" />,
                       bg: "from-orange-50 to-orange-100"
                     },
                     {
                       title: "Storage Tips",
                       tip: product.cooking_tips?.[1] || "Store in refrigerator after opening and consume within 5 days",
-                      icon: <Package className="w-6 h-6 text-amber-500" />,
+                      icon: <Package className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" />,
                       bg: "from-amber-50 to-amber-100"
                     },
                     {
                       title: "Pro Tip",
                       tip: product.cooking_tips?.[2] || "For best flavor, let it come to room temperature before serving",
-                      icon: <Sparkles className="w-6 h-6 text-yellow-500" />,
+                      icon: <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" />,
                       bg: "from-yellow-50 to-yellow-100"
                     }
                   ].map((item, index) => (
@@ -698,13 +794,13 @@ export default function ProductDetailPage() {
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
                       viewport={{ once: true }}
-                      className={`bg-gradient-to-br ${item.bg} p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col`}
+                      className={`bg-gradient-to-br ${item.bg} p-4 sm:p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300`}
                     >
-                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center mb-3 sm:mb-4 shadow-sm">
                         {item.icon}
                       </div>
-                      <h4 className="text-lg font-semibold text-gray-800 mb-2">{item.title}</h4>
-                      <p className="text-gray-600 flex-1">&ldquo;{item.tip}&rdquo;</p>
+                      <h4 className="text-sm sm:text-lg font-semibold text-gray-800 mb-2">{item.title}</h4>
+                      <p className="text-xs sm:text-sm text-gray-600">&ldquo;{item.tip}&rdquo;</p>
                     </motion.div>
                   ))}
                 </div>
@@ -716,13 +812,13 @@ export default function ProductDetailPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
                 viewport={{ once: true }}
-                className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
+                className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
               >
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center mb-4 sm:mb-6 mx-auto">
                   <Sparkles className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">Nutrition Facts</h3>
-                <div className="space-y-4">
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 text-center">Nutrition Facts</h3>
+                <div className="space-y-3 sm:space-y-4">
                   {Object.entries(product.nutrition_facts || {
                     calories: "85 kcal",
                     protein: "3.2g",
@@ -735,10 +831,10 @@ export default function ProductDetailPage() {
                       whileInView={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.1 }}
                       viewport={{ once: true }}
-                      className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                      className="flex justify-between items-center p-2 sm:p-3 bg-gray-50 rounded-lg"
                     >
-                      <span className="text-gray-600 capitalize font-medium">{key}</span>
-                      <span className="text-gray-800 font-bold">{value}</span>
+                      <span className="text-gray-600 capitalize font-medium text-sm sm:text-base">{key}</span>
+                      <span className="text-gray-800 font-bold text-sm sm:text-base">{value}</span>
                     </motion.div>
                   ))}
                 </div>
@@ -986,19 +1082,19 @@ export default function ProductDetailPage() {
 
         {/* Related Products Section */}
         {relatedProducts.length > 0 && (
-          <section className="py-20 bg-gradient-to-br from-orange-50 to-amber-50">
-            <div className="container mx-auto px-6">
+          <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-orange-50 to-amber-50">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
-                className="text-center mb-16"
+                className="text-center mb-12 sm:mb-16"
               >
-                <h2 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-6">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-4 sm:mb-6">
                   More Stories to Explore
                 </h2>
-                <p className="text-xl text-gray-600">
+                <p className="text-lg sm:text-xl text-gray-600">
                   Discover other culinary tales waiting to be told in your kitchen
                 </p>
               </motion.div>
