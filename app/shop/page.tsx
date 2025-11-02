@@ -492,137 +492,111 @@ function ProductCard({ product, index, onProductClick, onAddToCart, addingToCart
   
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-      whileHover={{ y: -8 }}
-      className="group cursor-pointer"
+      transition={{ 
+        delay: index * 0.1, 
+        duration: 0.4,
+        type: 'spring',
+        stiffness: 100
+      }}
+      whileHover={{ 
+        y: -4,
+        scale: 1.02,
+        transition: { duration: 0.2 }
+      }}
+      whileTap={{ scale: 0.98 }}
+      className="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-full touch-manipulation"
       onClick={() => onProductClick(product)}
     >
-      <div className={`bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 ${
-        isOutOfStock ? 'opacity-75' : 'hover:shadow-2xl'
-      }`}>
-        {/* Product Image */}
-        <div className="relative h-64 overflow-hidden">
-          <motion.div className="w-full h-full relative">
-            {product.image_url ? (
-              <Image
-                src={product.image_url}
-                alt={product.name}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover group-hover:scale-110 transition-transform duration-500"
-                onError={(e) => {
-                  // If image fails to load, show placeholder
-                  const target = e.target as HTMLImageElement;
-                  target.src = '/placeholder-food.svg';
-                }}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                <span className="text-gray-400">No image available</span>
-              </div>
-            )}
-          </motion.div>
-          
-          {/* Spice Level Badge */}
-          <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold text-white bg-gradient-to-r ${spiceDisplay.color}`}>
-            {spiceDisplay.emoji} {spiceDisplay.label}
-          </div>
-
-          {/* Stock Status */}
-          {isOutOfStock && (
-            <div className="absolute top-4 left-4 px-3 py-1 bg-gray-500 text-white rounded-full text-xs font-semibold">
-              Out of Stock
-            </div>
-          )}
-
-          {/* Stock Count */}
-          {!isOutOfStock && product.stock < 10 && (
-            <div className="absolute top-4 left-4 px-3 py-1 bg-amber-500 text-white rounded-full text-xs font-semibold">
-              {product.stock} left
-            </div>
-          )}
-
-          {/* Quick View Button */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileHover={{ opacity: 1 }}
-            className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center"
-          >
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="bg-white text-gray-800 px-4 py-2 rounded-full font-semibold flex items-center space-x-2"
-              onClick={(e) => {
-                e.stopPropagation();
-                onProductClick(product);
-              }}
-            >
-              <Eye className="w-4 h-4" />
-              <span>View Details</span>
-            </motion.button>
-          </motion.div>
+      {/* Product Image - Featured Card Style */}
+      <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden bg-gray-50">
+        <Image
+          src={product.image_url || '/placeholder-food.svg'}
+          alt={product.name}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = '/placeholder-food.svg';
+          }}
+        />
+        
+        {/* Spice Level Badge */}
+        <div className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-semibold text-white bg-gradient-to-r ${spiceDisplay.color}`}>
+          {spiceDisplay.emoji} {spiceDisplay.label}
         </div>
 
-        {/* Product Info */}
-        <div className="p-6">
-          <div className="flex items-start justify-between mb-3">
-            <h3 className="text-xl font-bold text-gray-800 group-hover:text-orange-600 transition-colors">
-              {product.name}
-            </h3>
-            <Heart className="w-5 h-5 text-gray-300 hover:text-red-500 cursor-pointer transition-colors" />
+        {/* Stock Status */}
+        {isOutOfStock && (
+          <div className="absolute inset-0 bg-gray-900/60 flex items-center justify-center">
+            <span className="bg-white text-gray-900 text-xs font-medium px-3 py-1 rounded-full">
+              Out of Stock
+            </span>
           </div>
+        )}
+
+        {/* Stock Count */}
+        {!isOutOfStock && product.stock < 10 && (
+          <div className="absolute top-2 right-2 px-2 py-1 bg-amber-500 text-white rounded-full text-xs font-semibold">
+            {product.stock} left
+          </div>
+        )}
+      </div>
+
+      {/* Product Info - Featured Card Style */}
+      <div className="p-3 sm:p-4 flex flex-col flex-1 space-y-2">
+        {/* Category Badge */}
+        <div className="flex justify-start">
+          <span className="inline-block bg-orange-50 text-orange-700 text-xs font-medium px-2 py-1 rounded-full">
+            {product.category}
+          </span>
+        </div>
+
+        {/* Product Name */}
+        <div className="flex-1">
+          <h3 className="font-bold text-sm sm:text-base md:text-lg text-gray-900 mb-1 line-clamp-2 min-h-[2.5rem]">
+            {product.name}
+          </h3>
           
-          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+          <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2">
             {product.description}
           </p>
+        </div>
 
-          {/* Tags */}
-          {product.tags && product.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-4">
-              {product.tags.slice(0, 3).map((tag, idx) => (
-                <span
-                  key={idx}
-                  className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full"
-                >
-                  {tag}
-                </span>
-              ))}
+        {/* Price and Add to Cart */}
+        <div className="flex items-center justify-between mt-auto">
+          <div>
+            <div className="text-base sm:text-lg font-bold text-gray-900">
+              ₹{product.price.toFixed(2)}
             </div>
-          )}
-
-          {/* Price and Add to Cart */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl font-bold text-gray-800">₹{product.price}</span>
-            </div>
-            
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={(e) => onAddToCart(product, e)}
-              disabled={addingToCart === product.id.toString() || isOutOfStock}
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 ${
-                isOutOfStock 
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 shadow-lg'
-              }`}
-              title={isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
-            >
-              {addingToCart === product.id.toString() ? (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
-                />
-              ) : isOutOfStock ? (
-                <span className="text-xs">✕</span>
-              ) : (
-                <Plus className="w-5 h-5" />
-              )}
-            </motion.button>
           </div>
+          
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={(e) => onAddToCart(product, e)}
+            disabled={addingToCart === product.id.toString() || isOutOfStock}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 ${
+              isOutOfStock 
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 shadow-lg'
+            }`}
+            title={isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+          >
+            {addingToCart === product.id.toString() ? (
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+              />
+            ) : isOutOfStock ? (
+              <span className="text-xs">✕</span>
+            ) : (
+              <Plus className="w-5 h-5" />
+            )}
+          </motion.button>
         </div>
       </div>
     </motion.div>
