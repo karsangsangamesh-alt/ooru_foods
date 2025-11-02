@@ -7,8 +7,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
 import LoginModal from "./LoginModal";
 import SearchBar from "./SearchBar";
-import ChefSecrets from "./ChefSecrets";
-import { ShoppingCart, Bell, Menu, X, Search, User, LogOut, LogIn, ChevronUp, ChevronDown, ChefHat } from "lucide-react";
+import { ShoppingCart, Bell, Menu, X, Search, User, LogOut, LogIn, ChevronUp, ChevronDown } from "lucide-react";
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -24,7 +23,6 @@ export default function Header() {
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [showHeader, setShowHeader] = useState(true);
-  const [isChefSecretsOpen, setIsChefSecretsOpen] = useState(false);
   const fullPlaceholder = 'Shenga chutney';
   
   // Smooth scroll tracking for header animation
@@ -269,33 +267,6 @@ export default function Header() {
 
                 {/* Right Section - Mobile-First Icons */}
                 <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-3 flex-shrink-0">
-                  {/* Chef's Secrets Button - Always visible on mobile */}
-                  <motion.button
-                    whileHover={{ 
-                      scale: 1.05
-                    }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setIsChefSecretsOpen(true)}
-                    className="relative p-2 sm:p-2.5 lg:p-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-full transition-all duration-300 group min-w-[44px] min-h-[44px] flex items-center justify-center"
-                    title="Chef's Secrets"
-                  >
-                    <ChefHat className="w-5 h-5 sm:w-5 sm:h-5 lg:w-6 lg:h-6 group-hover:animate-pulse" />
-                    
-                    {/* Secret indicator */}
-                    <motion.div
-                      animate={{ 
-                        scale: [1, 1.2, 1],
-                        opacity: [0.6, 1, 0.6]
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                      className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full border border-white shadow-sm"
-                    />
-                  </motion.button>
-
                   {/* Cart Icon - Always visible */}
                   <motion.button
                     whileHover={{ 
@@ -510,12 +481,6 @@ export default function Header() {
       <LoginModal 
         isOpen={isLoginModalOpen} 
         onClose={() => setIsLoginModalOpen(false)} 
-      />
-      
-      {/* Chef's Secrets Modal */}
-      <ChefSecrets
-        isOpen={isChefSecretsOpen}
-        onClose={() => setIsChefSecretsOpen(false)}
       />
       
       {/* Scroll Progress Indicator */}
